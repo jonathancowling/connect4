@@ -7,14 +7,14 @@
 /**
  * @returns {Element}
  */
-function initCoin() {
+function initCoin(color) {
     const coin = document
         .querySelector('#coin-template')
         .content
         .cloneNode(true)
         .firstElementChild
     
-    coin.style.backgroundColor = 'red'
+    coin.style.backgroundColor = color
 
     return coin
 }

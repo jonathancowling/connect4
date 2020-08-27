@@ -13,9 +13,19 @@ describe('initCoin', () => {
         expect(el).toBeInstanceOf(Element)
         expect(el.style.backgroundColor).toBe('red')
     })
-})
 
-test.todo('initCoin creates a yellow coin')
+    it('creates a yellow coin', () => {
+        const template = document.createElement('template')
+        template.setAttribute('id', 'coin-template')
+        const templateContent = document.createElement('div')
+        template.content.appendChild(templateContent)
+        document.body.appendChild(template)
+
+        const el = initCoin('yellow')
+        expect(el).toBeInstanceOf(Element)
+        expect(el.style.backgroundColor).toBe('yellow')
+    })
+})
 
 test.todo('dropCoin places coin in correct column')
 
