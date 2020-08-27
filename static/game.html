@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="game.css">
+    <title>Ongoing Game | Connect 4</title>
+</head>
+<body>
+    <section id="notifications"></section>
+    <main>
+        <section id="turn-tracker"></section>
+        <section id="main-game"></section>
+    </main>
+    <button>Drop</button>
+    
+    <template id="coin-template">
+        <div class="round" style="height: 6rem; width: 6rem; border: 1px solid black;">
+            <div class="round" style="height: 4rem; width: 4rem; margin: 1rem; border: 1px solid black;"></div>
+        </div>
+    </template>
+
+    <template id="slot-template">
+        <div class="round" style="height: 6rem; width: 6rem;"></div>
+    </template>
+</body>
+</html>

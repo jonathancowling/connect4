@@ -1,0 +1,42 @@
+* {
+    font-family: sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    flex-direction: column;
+}
+
+header {
+    flex: none;
+    padding: .5rem;
+    display: flex;
+    justify-content: flex-end;
+    background-color: #f00;
+}
+
+header h1 {
+    margin: 0;
+    display: inline;
+}
+
+header span {
+    flex: 0 1 10%;
+}
+
+main {
+    flex: 0 1 100vh;
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+    align-items: center;
+}
+
+main button {
+    padding: 1rem;
+    width: 30%;
+}

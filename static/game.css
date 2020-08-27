@@ -1,0 +1,19 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+button {
+    width: calc(100% - 2rem);
+    padding: 1rem;
+    margin: 1rem;
+    box-sizing: border-box;
+}
+
+#main-game {
+    display: grid;
+}
+
+.round {
+    border-radius: 50%;
+}
