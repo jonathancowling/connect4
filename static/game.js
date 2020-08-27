@@ -19,5 +19,9 @@ function initCoin(color) {
     return coin
 }
 
+function placeCoin(coin, row, col) {
+    document.querySelector('#main-game').children[row].children[col].appendChild(coin)
+}
+
 module = module || {};
-module.exports = { initCoin };
+module.exports = { initCoin, placeCoin };

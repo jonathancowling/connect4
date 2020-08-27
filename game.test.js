@@ -1,4 +1,4 @@
-const { initCoin } = require('./static/game')
+const { initCoin, placeCoin } = require('./static/game')
 
 describe('initCoin', () => {
     it('creates a red coin', () => {
@@ -27,15 +27,58 @@ describe('initCoin', () => {
     })
 })
 
-test.todo('dropCoin places coin in correct column')
+describe('placeCoin', () => {
+    it('places coins in the correct cells', () => {
+        const board = document.createElement('table')
+        board.setAttribute('id', 'main-game')
+        for (let i = 0; i < 2; i++) {
+            const row = document.createElement('tr')
+            for (let j = 0; j < 2; j++) {
+                row.appendChild(document.createElement('td'))
+            }
+            board.appendChild(row)
+        }
+        document.body.appendChild(board)
 
-test.todo('dropCoin places coin adjacent')
+        const coin1 = document.createElement('div')
+        const coin2 = document.createElement('div')
+        const coin3 = document.createElement('div')
+        const coin4 = document.createElement('div')
 
-test.todo('dropCoin places coin on top')
+        placeCoin(coin1, 0, 0)
+        expect(board.children[0].children[0].firstElementChild).toBe(coin1)
+        expect(board.children[1].children[1].firstElementChild).toBe(null)
+        expect(board.children[0].children[1].firstElementChild).toBe(null)
+        expect(board.children[1].children[0].firstElementChild).toBe(null)
 
-test.todo('dropCoin emits error event if coin placed on full column')
+        placeCoin(coin2, 1, 1)
+        expect(board.children[0].children[0].firstElementChild).toBe(coin1)
+        expect(board.children[1].children[1].firstElementChild).toBe(coin2)
+        expect(board.children[0].children[1].firstElementChild).toBe(null)
+        expect(board.children[1].children[0].firstElementChild).toBe(null)
+        placeCoin(coin3, 0, 1)
+        expect(board.children[0].children[0].firstElementChild).toBe(coin1)
+        expect(board.children[1].children[1].firstElementChild).toBe(coin2)
+        expect(board.children[0].children[1].firstElementChild).toBe(coin3)
+        expect(board.children[1].children[0].firstElementChild).toBe(null)
+        
+        placeCoin(coin4, 1, 0)
+        expect(board.children[0].children[0].firstElementChild).toBe(coin1)
+        expect(board.children[1].children[1].firstElementChild).toBe(coin2)
+        expect(board.children[0].children[1].firstElementChild).toBe(coin3)
+        expect(board.children[1].children[0].firstElementChild).toBe(coin4)
+    })
+})
 
-test.todo('dropCoin emits error event if coin placed outside of board')
+test.todo('takeTurn places coin adjacent')
+
+test.todo('takeTurn places coin adjacent')
+
+test.todo('takeTurn places coin on top')
+
+test.todo('takeTurn emits error event if coin placed on full column')
+
+test.todo('takeTurn emits error event if coin placed outside of board')
 
 test.todo("checkWin on an empty board doesn't change state")
 
