@@ -1,4 +1,5 @@
-const { initCoin, placeCoin } = require('./static/game')
+const { default: each } = require('jest-each')
+const { initCoin, placeCoin, takeTurn, ILLEGAL_MOVE_FULL_COLUMN, ILLEGAL_MOVE_COLUMN_DOESNT_EXIST } = require('./static/game')
 
 describe('initCoin', () => {
     it('creates a red coin', () => {
@@ -70,15 +71,172 @@ describe('placeCoin', () => {
     })
 })
 
-test.todo('takeTurn places coin adjacent')
+describe('takeTurn', () => {
 
-test.todo('takeTurn places coin adjacent')
+    each([
+        [
+            {
+                board: [
+                    [null, null],
+                    [null, null]
+                ],
+                winner: null,
+                player: 0
+            },
+            0,
+            {
+                board: [
+                    [null, null],
+                    [0, null]
+                ],
+                winner: null,
+                player: 1
+            }
+        ],
+        [
+            {
+                board: [
+                    [null, null],
+                    [0, null]
+                ],
+                winner: null,
+                player: 0
+            },
+            0,
+            {
+                board: [
+                    [0, null],
+                    [0, null]
+                ],
+                winner: null,
+                player: 1
+            }
+        ],
+        [
+            {
+                board: [
+                    [0, null],
+                    [0, null]
+                ],
+                winner: null,
+                player: 0
+            },
+            1,
+            {
+                board: [
+                    [0, null],
+                    [0, 0]
+                ],
+                winner: null,
+                player: 1
+            }
+        ],
+        [
+            {
+                board: [
+                    [0, null],
+                    [0, 0]
+                ],
+                winner: null,
+                player: 0
+            },
+            1,
+            {
+                board: [
+                    [0, 0],
+                    [0, 0]
+                ],
+                winner: null,
+                player: 1
+            }
+        ],
+        [
+            {
+                board: [
+                    [0, null],
+                    [0, null]],
+                winner: null,
+                player: 1
+            },
+            1,
+            {
+                board: [
+                    [0, null],
+                    [0, 1]
+                ],
+                winner: null,
+                player: 0
+            }
+        ]
+    ]).it('correctly updates board and player (happy path)', (initialState, col, expectedState) => {
+        expect(takeTurn(initialState, col)).toEqual(expectedState)
+    })
 
-test.todo('takeTurn places coin on top')
+    it('sets full column error if coin placed on full column', () => {
+        const initialState = {
+            board: [
+                [0]
+            ],
+            winner: null,
+            player: 0
+        }
 
-test.todo('takeTurn emits error event if coin placed on full column')
+        const expectedState = {
+            board: [
+                [0]
+            ],
+            winner: null,
+            player: 0,
+            error: ILLEGAL_MOVE_FULL_COLUMN
+        }
 
-test.todo('takeTurn emits error event if coin placed outside of board')
+        expect(takeTurn(initialState, 0)).toEqual(expectedState)
+    })
+
+    it('sets no column exists error if coin placed on a column that doesn\'t exists', () => {
+        const initialState = {
+            board: [
+                [null],
+            ],
+            winner: null,
+            player: 0
+        }
+
+        const expectedState = {
+            board: [
+                [null],
+            ],
+            winner: null,
+            player: 0,
+            error: ILLEGAL_MOVE_COLUMN_DOESNT_EXIST
+        }
+
+        expect(takeTurn(initialState, 1)).toEqual(expectedState)
+    })
+
+    it('clears error on legal move', () => {
+        const initialState = {
+            board: [
+                [null, null],
+                [null, null]
+            ],
+            winner: null,
+            player: 0,
+            error: ILLEGAL_MOVE_FULL_COLUMN
+        }
+        
+        const expectedState = {
+            board: [
+                [null, null],
+                [0, null]
+            ],
+            winner: null,
+            player: 1
+        }
+
+        expect(takeTurn(initialState, 0)).toEqual(expectedState)
+    })
+})
 
 test.todo("checkWin on an empty board doesn't change state")
 
