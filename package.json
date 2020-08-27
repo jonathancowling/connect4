@@ -1,0 +1,23 @@
+{
+  "name": "connect4",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonathancowling/connect4.git"
+  },
+  "author": "Jonathan Cowling",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/jonathancowling/connect4/issues"
+  },
+  "homepage": "https://github.com/jonathancowling/connect4#readme",
+  "devDependencies": {
+    "@types/jest": "^26.0.10",
+    "jest": "^26.4.2"
+  }
+}

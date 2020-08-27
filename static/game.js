@@ -3,3 +3,21 @@
 // coin.firstElementChild // only usable before in document
 // coin.firstElementChild.style.backgroundColor = 'red'
 // document.querySelector('#main-game').appendChild(coin)
+
+/**
+ * @returns {Element}
+ */
+function initCoin() {
+    const coin = document
+        .querySelector('#coin-template')
+        .content
+        .cloneNode(true)
+        .firstElementChild
+    
+    coin.style.backgroundColor = 'red'
+
+    return coin
+}
+
+module = module || {};
+module.exports = { initCoin };

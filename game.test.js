@@ -1,5 +1,19 @@
+const { initCoin } = require('./static/game')
 
-test.todo('initCoin creates a red coin')
+describe('initCoin', () => {
+    it('creates a red coin', () => {
+
+        const template = document.createElement('template')
+        template.setAttribute('id', 'coin-template')
+        const templateContent = document.createElement('div')
+        template.content.appendChild(templateContent)
+        document.body.appendChild(template)
+
+        const el = initCoin('red')
+        expect(el).toBeInstanceOf(Element)
+        expect(el.style.backgroundColor).toBe('red')
+    })
+})
 
 test.todo('initCoin creates a yellow coin')
 
