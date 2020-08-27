@@ -49,6 +49,8 @@ function takeTurn(state, colIndex) {
     return newState
 }
 
+
+
 const ILLEGAL_MOVE_FULL_COLUMN = 0x1
 const ILLEGAL_MOVE_COLUMN_DOESNT_EXIST = 0x2
 

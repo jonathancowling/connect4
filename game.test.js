@@ -1,5 +1,6 @@
-const { default: each } = require('jest-each')
 const { initCoin, placeCoin, takeTurn, ILLEGAL_MOVE_FULL_COLUMN, ILLEGAL_MOVE_COLUMN_DOESNT_EXIST } = require('./static/game')
+
+
 
 describe('initCoin', () => {
     it('creates a red coin', () => {
@@ -29,8 +30,16 @@ describe('initCoin', () => {
 })
 
 describe('placeCoin', () => {
-    it('places coins in the correct cells', () => {
-        const board = document.createElement('table')
+
+    let board
+
+    afterAll(() => {
+        document.body.innerHTML = '';
+        document.head.innerHTML = '';
+    })
+
+    beforeAll(() => {
+        board = document.createElement('table')
         board.setAttribute('id', 'main-game')
         for (let i = 0; i < 2; i++) {
             const row = document.createElement('tr')
@@ -40,40 +49,30 @@ describe('placeCoin', () => {
             board.appendChild(row)
         }
         document.body.appendChild(board)
+    })
 
-        const coin1 = document.createElement('div')
-        const coin2 = document.createElement('div')
-        const coin3 = document.createElement('div')
-        const coin4 = document.createElement('div')
+    const coin1 = document.createElement('div')
+    const coin2 = document.createElement('div')
+    const coin3 = document.createElement('div')
+    const coin4 = document.createElement('div')
 
-        placeCoin(coin1, 0, 0)
-        expect(board.children[0].children[0].firstElementChild).toBe(coin1)
-        expect(board.children[1].children[1].firstElementChild).toBe(null)
-        expect(board.children[0].children[1].firstElementChild).toBe(null)
-        expect(board.children[1].children[0].firstElementChild).toBe(null)
-
-        placeCoin(coin2, 1, 1)
-        expect(board.children[0].children[0].firstElementChild).toBe(coin1)
-        expect(board.children[1].children[1].firstElementChild).toBe(coin2)
-        expect(board.children[0].children[1].firstElementChild).toBe(null)
-        expect(board.children[1].children[0].firstElementChild).toBe(null)
-        placeCoin(coin3, 0, 1)
-        expect(board.children[0].children[0].firstElementChild).toBe(coin1)
-        expect(board.children[1].children[1].firstElementChild).toBe(coin2)
-        expect(board.children[0].children[1].firstElementChild).toBe(coin3)
-        expect(board.children[1].children[0].firstElementChild).toBe(null)
-        
-        placeCoin(coin4, 1, 0)
-        expect(board.children[0].children[0].firstElementChild).toBe(coin1)
-        expect(board.children[1].children[1].firstElementChild).toBe(coin2)
-        expect(board.children[0].children[1].firstElementChild).toBe(coin3)
-        expect(board.children[1].children[0].firstElementChild).toBe(coin4)
+    it.each([
+        [coin1, 0, 0, [coin1, null, null, null]],
+        [coin2, 1, 1, [coin1, coin2, null, null]],
+        [coin3, 0, 1, [coin1, coin2, coin3, null]],
+        [coin4, 1, 0, [coin1, coin2, coin3, coin4]]
+    ])('places coins in the correct cells', (coin, row, col, expected) => {
+        placeCoin(coin, row, col)
+        expect(board.children[0].children[0].firstElementChild).toBe(expected[0])
+        expect(board.children[1].children[1].firstElementChild).toBe(expected[1])
+        expect(board.children[0].children[1].firstElementChild).toBe(expected[2])
+        expect(board.children[1].children[0].firstElementChild).toBe(expected[3])
     })
 })
 
 describe('takeTurn', () => {
 
-    each([
+    it.each([
         [
             {
                 board: [
@@ -168,7 +167,7 @@ describe('takeTurn', () => {
                 player: 0
             }
         ]
-    ]).it('correctly updates board and player (happy path)', (initialState, col, expectedState) => {
+    ])('correctly updates board and player (happy path)', (initialState, col, expectedState) => {
         expect(takeTurn(initialState, col)).toEqual(expectedState)
     })
 
