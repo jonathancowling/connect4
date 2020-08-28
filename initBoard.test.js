@@ -33,13 +33,23 @@ describe('initBoard', () => {
         board.setAttribute('id', 'main-game')
         document.body.appendChild(board)
 
+        const slotTemplate = document.createElement('template')
+        slotTemplate.id = 'slot-template'
+        const slotTemplateContent = document.createElement('div')
+        slotTemplateContent.classList.add('slot')
+        slotTemplate.content.appendChild(slotTemplateContent)
+        document.body.appendChild(slotTemplate)
+
         initBoard(state)
         expect(board.childElementCount).toBe(n)
+        board.firstChild
         for (row of board.children) {
             expect(row.nodeName).toBe('TR')
             expect(row.childElementCount).toBe(m)
-            for (cell of row.children) {
+            for (const cell of row.children) {
                 expect(cell.nodeName).toBe('TD')
+                expect(cell.childElementCount).toBe(1)
+                expect(cell.firstElementChild.isEqualNode(slotTemplate.content.firstElementChild)).toBe(true)
             }
         }
     })

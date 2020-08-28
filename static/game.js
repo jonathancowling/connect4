@@ -20,7 +20,11 @@ function initCoin(color) {
 }
 
 function placeCoin(coin, row, col) {
-    document.querySelector('#main-game').children[row].children[col].appendChild(coin)
+    document
+      .querySelector('#main-game')
+      .children[row].children[col]
+      .querySelector('.slot')
+      .appendChild(coin)
 }
 
 function takeTurn(state, colIndex) {

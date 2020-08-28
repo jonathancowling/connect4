@@ -10,7 +10,7 @@
     <section id="notifications"></section>
     <main>
         <section id="turn-tracker"></section>
-        <section id="main-game"></section>
+        <table id="main-game"></table>
     </main>
     <button>Drop</button>
     
@@ -23,5 +23,18 @@
     <template id="slot-template">
         <div class="round" style="height: 6rem; width: 6rem;"></div>
     </template>
+
+    <script src="./initBoard.js" type="text/javascript"></script>
+    <script src="./game.js" type="text/javascript"></script>
+    <script>
+        initBoard({
+            board: [
+                [null, null],
+                [null, null]
+            ],
+            winner: null,
+            player: 0
+        })
+    </script>
 </body>
 </html>
