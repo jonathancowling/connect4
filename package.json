@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -18,7 +19,19 @@
   "homepage": "https://github.com/jonathancowling/connect4#readme",
   "devDependencies": {
     "@types/jest": "^26.0.10",
+    "eslint": "^7.8.1",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jest": "^23.20.0",
+    "husky": "^4.2.5",
     "jest": "^26.4.2",
     "jest-each": "^26.4.2"
+  },
+  "dependencies": {},
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint && npm run test"
+    }
   }
 }
