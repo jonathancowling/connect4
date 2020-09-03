@@ -4,7 +4,6 @@ const {
   onNewStateSelectColumnFactory,
   initCoin,
   placeCoin,
-  selectColumnFactory,
 } = require('./static/ui');
 
 describe('initCoin', () => {
@@ -134,7 +133,7 @@ describe('on new state', () => {
     document.head.innerHTML = '';
   });
 
-  it.each([
+  test.each([
     [
       {
         board: [[0]],
@@ -178,7 +177,7 @@ describe('on new state', () => {
       3,
     ],
   ])(
-    'coins are placed in the correct placed using the factory',
+    'coins are placed in the correct places',
     (state, expectedCoinLocation) => {
       const e = new CustomEvent('newstate', {
         target: jest.fn(),
@@ -202,7 +201,7 @@ describe('on new state', () => {
     },
   );
 
-  it('click listeners are replaced using the factory', () => {
+  test('columnselected emiting click listeners are replaced', () => {
     const event1 = new CustomEvent('newstate', {
       detail: { state: jest.fn() },
     });
@@ -211,60 +210,45 @@ describe('on new state', () => {
       detail: { state: jest.fn() },
     });
 
-    const mockSelectColumnFactory = jest.fn();
+    const target = {
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    };
 
-    const firstListener = jest.fn();
-    const secondListener = jest.fn();
+    const expectedIndex = 0;
 
-    mockSelectColumnFactory
-      .mockImplementationOnce(() => firstListener)
-      .mockImplementationOnce(() => secondListener)
-      .mockImplementation(fail);
-
-    const target = { addEventListener: jest.fn(), removeEventListener: jest.fn() };
-
-    const selectColumn = onNewStateSelectColumnFactory(target, mockSelectColumnFactory);
+    const selectColumn = onNewStateSelectColumnFactory(target, expectedIndex);
     selectColumn(event1);
     selectColumn(event2);
 
-    expect(mockSelectColumnFactory.mock.calls).toEqual([
-      [event1.detail.state],
-      [event2.detail.state],
-    ]);
     expect(target.addEventListener.mock.calls).toEqual([
-      ['click', firstListener],
-      ['click', secondListener],
+      ['click', expect.any(Function)],
+      ['click', expect.any(Function)],
     ]);
+
+    const firstClickListener = target.addEventListener.mock.calls[0][1];
+
     expect(target.removeEventListener.mock.calls).toEqual([
       ['click', undefined],
-      ['click', firstListener],
+      ['click', firstClickListener],
     ]);
-  });
 
-  it.todo('resets the colors');
+    const secondClickListener = target.addEventListener.mock.calls[1][1];
+    secondClickListener();
+
+    expect(target.dispatchEvent.mock.calls).toEqual([
+      [expect.any(CustomEvent)],
+    ]);
+    expect(target.dispatchEvent.mock.calls[0][0].type).toBe('columnselected');
+    expect(target.dispatchEvent.mock.calls[0][0].detail).toEqual({
+      state: event2.detail.state,
+      index: expectedIndex,
+    });
+  });
 });
 
-describe.skip('selectColumn', () => {
-  it('replaces the eventListener on the drop button', () => {
-    const dropButton = document.createElement('button');
-    dropButton.id = 'drop-button';
-    dropButton.addEventListener = jest.fn();
-
-    const col = {
-      style: {},
-    };
-
-    const event = {
-      target: col,
-    };
-
-    selectColumnFactory(0)(event);
-
-    expect(col.style.backgroundColor).toBe('blue');
-
-    // expect(dropButton.addEventListener.mock.calls).toEqual([
-    //   ['click', unhighlight(0)],
-    //   ['click', takeTurn()],
-    // ]);
-  });
+describe('on column selected', () => {
+  test.todo('columns colors are set correctly');
+  test.todo('the drop button sets up takeTurn on click');
 });

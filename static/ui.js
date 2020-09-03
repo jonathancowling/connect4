@@ -13,7 +13,7 @@ function initBoard(state) {
   });
 }
 
-function onNewStatePlaceCoin(_initCoin, _placeCoin) {
+function onNewStatePlaceCoinFactory(_initCoin, _placeCoin) {
   return (/** @type {CustomEvent} */ event) => {
     const [, row, col] = event.detail.state.moves[event.detail.state.moves.length - 1];
 
@@ -23,12 +23,19 @@ function onNewStatePlaceCoin(_initCoin, _placeCoin) {
   };
 }
 
-function onNewStateSelectColumn(target, _selectColumnFactory) {
+function onNewStateSelectColumnFactory(/** @type {Node} */target, index) {
   let currentClickListener;
 
-  return (/** @type {CustomEvent} */ event) => {
+  return (/** @type {CustomEvent} */ newStateEvent) => {
     target.removeEventListener('click', currentClickListener);
-    currentClickListener = _selectColumnFactory(event.detail.state);
+    currentClickListener = () => {
+      target.dispatchEvent(new CustomEvent('columnselected', {
+        detail: {
+          state: newStateEvent.detail.state,
+          index,
+        },
+      }));
+    };
     target.addEventListener('click', currentClickListener);
   };
 }
@@ -65,8 +72,8 @@ function selectColumnFactory(_index) {
 module = module || {};
 module.exports = {
   initBoard,
-  onNewStatePlaceCoinFactory: onNewStatePlaceCoin,
-  onNewStateSelectColumnFactory: onNewStateSelectColumn,
+  onNewStatePlaceCoinFactory,
+  onNewStateSelectColumnFactory,
   initCoin,
   placeCoin,
   selectColumnFactory,
