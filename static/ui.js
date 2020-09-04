@@ -13,14 +13,26 @@ function initBoard(state) {
   });
 }
 
-function onNewStatePlaceCoinFactory(_initCoin, _placeCoin) {
+function onNewStatePlaceCoinFactory(_initCoin, _placeCoin, _getColor) {
   return (/** @type {CustomEvent} */ event) => {
-    const [, row, col] = event.detail.state.moves[event.detail.state.moves.length - 1];
+    if (event.detail.state.moves.length === 0) {
+      return;
+    }
+
+    const [player, row, col] = event.detail.state.moves[event.detail.state.moves.length - 1];
 
     const rowOffset = row * event.detail.state.board[0].length;
 
-    _placeCoin(_initCoin(), rowOffset + col);
+    _placeCoin(_initCoin(_getColor(player)), rowOffset + col);
   };
+}
+
+function getColor(player) {
+  switch (player) {
+    case 0: return 'red';
+    case 1: return 'yellow';
+    default: return 'transparent';
+  }
 }
 
 function onNewStateSelectColumnFactory(/** @type {Node} */target, index) {
@@ -29,7 +41,7 @@ function onNewStateSelectColumnFactory(/** @type {Node} */target, index) {
   return (/** @type {CustomEvent} */ newStateEvent) => {
     target.removeEventListener('click', currentClickListener);
     currentClickListener = () => {
-      target.dispatchEvent(new CustomEvent('columnselected', {
+      document.dispatchEvent(new CustomEvent('columnselected', {
         detail: {
           state: newStateEvent.detail.state,
           index,
@@ -62,10 +74,38 @@ function placeCoin(coin, index) {
     .appendChild(coin);
 }
 
-// eslint-disable-next-line no-unused-vars
-function selectColumnFactory(_index) {
-  // eslint-disable-next-line no-unused-vars
-  return (/** @type {Event} */ _event) => {};
+function onColumnSelectedSetHighlightFactory(
+  index,
+  /** @type {Element} */target,
+  {
+    highlighted, unhighlighted,
+  },
+) {
+  return (columnselectedEvent) => {
+    if (columnselectedEvent.detail.index === index) {
+      // eslint-disable-next-line no-param-reassign
+      target.style.backgroundColor = highlighted;
+    } else {
+      // eslint-disable-next-line no-param-reassign
+      target.style.backgroundColor = unhighlighted;
+    }
+  };
+}
+
+function onColumnSelectedTakeTurnFactory(target, takeTurn) {
+  let currentClickListener;
+
+  return (/** @type {CustomEvent} */ columnselectedEvent) => {
+    target.removeEventListener('click', currentClickListener);
+    currentClickListener = () => {
+      document.dispatchEvent(new CustomEvent('newstate', {
+        detail: {
+          state: takeTurn(columnselectedEvent.detail.state, columnselectedEvent.detail.index),
+        },
+      }));
+    };
+    target.addEventListener('click', currentClickListener);
+  };
 }
 
 // eslint-disable-next-line no-global-assign
@@ -76,5 +116,7 @@ module.exports = {
   onNewStateSelectColumnFactory,
   initCoin,
   placeCoin,
-  selectColumnFactory,
+  getColor,
+  onColumnSelectedSetHighlightFactory,
+  onColumnSelectedTakeTurnFactory,
 };

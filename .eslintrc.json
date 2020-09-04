@@ -20,6 +20,23 @@
             "plugins": [
                 "jest"
             ]
+        },
+        {
+            "files": ["./static/init.js"],
+            "globals": {
+                "initBoard": "readonly",
+                "onNewStatePlaceCoinFactory": "readonly",
+                "initCoin": "readonly",
+                "placeCoin": "readonly",
+                "getColor": "readonly",
+                "onColumnSelectedSetHighlightFactory": "readonly",
+                "onNewStateSelectColumnFactory": "readonly",
+                "onColumnSelectedTakeTurnFactory": "readonly",
+                "takeTurn": "readonly"
+            },
+            "plugins": [
+                "jest"
+            ]
         }
     ]
 }
