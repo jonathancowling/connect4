@@ -1,9 +1,3 @@
-// TODO: snippet for creating coin
-// let coin = document.querySelector('#coin-template').content.cloneNode(true)
-// coin.firstElementChild // only usable before in document
-// coin.firstElementChild.style.backgroundColor = 'red'
-// document.querySelector('#main-game').appendChild(coin)
-
 function takeTurn(state, colIndex) {
   const newState = JSON.parse(JSON.stringify(state));
   delete newState.error;
@@ -35,6 +29,7 @@ function takeTurn(state, colIndex) {
 const ILLEGAL_MOVE_FULL_COLUMN = 0x1;
 const ILLEGAL_MOVE_COLUMN_DOESNT_EXIST = 0x2;
 
+/* istanbul ignore next */
 // eslint-disable-next-line no-global-assign
 module = module || {};
 module.exports = { takeTurn, ILLEGAL_MOVE_COLUMN_DOESNT_EXIST, ILLEGAL_MOVE_FULL_COLUMN };

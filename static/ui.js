@@ -108,6 +108,7 @@ function onColumnSelectedTakeTurnFactory(target, takeTurn) {
   };
 }
 
+/* istanbul ignore next */
 // eslint-disable-next-line no-global-assign
 module = module || {};
 module.exports = {

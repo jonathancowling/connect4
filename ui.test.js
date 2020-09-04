@@ -6,6 +6,7 @@ const {
   placeCoin,
   onColumnSelectedSetHighlightFactory,
   onColumnSelectedTakeTurnFactory,
+  getColor,
 } = require('./static/ui');
 
 document.dispatchEvent = jest.fn();
@@ -210,6 +211,8 @@ describe('on new state', () => {
     },
   );
 
+  test.todo('selected column is reset');
+
   test('no coins are placed if there are no moves', () => {
     const e = new CustomEvent('newstate', {
       target: jest.fn(),
@@ -357,5 +360,15 @@ describe('on column selected', () => {
     ]);
     expect(document.dispatchEvent.mock.calls[0][0].type).toBe('newstate');
     expect(document.dispatchEvent.mock.calls[0][0].detail).toEqual({ state: event2.detail.state });
+  });
+});
+
+describe('getColor', () => {
+  it.each([
+    [0, 'red'],
+    [1, 'yellow'],
+    [-1, 'transparent'],
+  ])('assigns player "%d" color "%s"', (player, expectedColor) => {
+    expect(getColor(player)).toBe(expectedColor);
   });
 });
