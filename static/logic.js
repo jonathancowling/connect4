@@ -26,10 +26,23 @@ function takeTurn(state, colIndex) {
   return newState;
 }
 
+// eslint-disable-next-line no-unused-vars
+function checkWin(_state) {
+  return {
+    gameOver: false,
+    winner: undefined,
+  };
+}
+
 const ILLEGAL_MOVE_FULL_COLUMN = 0x1;
 const ILLEGAL_MOVE_COLUMN_DOESNT_EXIST = 0x2;
 
 /* istanbul ignore next */
 // eslint-disable-next-line no-global-assign
 module = module || {};
-module.exports = { takeTurn, ILLEGAL_MOVE_COLUMN_DOESNT_EXIST, ILLEGAL_MOVE_FULL_COLUMN };
+module.exports = {
+  takeTurn,
+  checkWin,
+  ILLEGAL_MOVE_COLUMN_DOESNT_EXIST,
+  ILLEGAL_MOVE_FULL_COLUMN,
+};

@@ -1,6 +1,5 @@
-// TODO: this one file will have a function to set event listeners and init board and all that
+// TODO: test this separately by setting globals
 
-// i can test this separately by setting globals
 const numCols = 5;
 const numRows = 5;
 const board = [];

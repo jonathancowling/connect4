@@ -1,4 +1,9 @@
-const { takeTurn, ILLEGAL_MOVE_FULL_COLUMN, ILLEGAL_MOVE_COLUMN_DOESNT_EXIST } = require('../static/logic');
+const {
+  takeTurn,
+  checkWin,
+  ILLEGAL_MOVE_FULL_COLUMN,
+  ILLEGAL_MOVE_COLUMN_DOESNT_EXIST,
+} = require('../static/logic');
 
 describe('takeTurn', () => {
   it.each([
@@ -182,12 +187,290 @@ describe('takeTurn', () => {
   });
 });
 
-test.todo("checkWin on an empty board doesn't change state");
+test.skip.each([
+  [
+    [],
+    {
+      gameOver: true,
+      winner: undefined,
+    },
+  ],
+  [
+    [[null]],
+    {
+      gameOver: false,
+      winner: undefined,
+    },
+  ],
+  [
+    [[0]],
+    {
+      gameOver: true,
+      winner: undefined,
+    },
+  ],
+  [
+    {
+      board: [
+        [null, null, null, null, null],
+        [null, null, null, null, null],
+        [null, null, null, null, null],
+        [null, null, null, null, null],
+        [null, null, null, null, null],
+      ],
+    },
+    {
+      gameOver: false,
+      winner: undefined,
+    },
+  ],
+  [
+    {
+      board: [
+        [null, null, null, null, null, null],
+        [0, null, null, null, null, null],
+        [null, null, null, null, null, null],
+        [0, null, null, null, null, null],
+        [0, null, null, null, null, null],
+        [0, null, null, null, null, null],
+      ],
+    },
+    {
+      gameOver: false,
+      winner: undefined,
+    },
+  ],
+  [
+    {
+      board: [
+        [null, null, null, null, null, null],
+        [null, null, null, null, null, null],
+        [0, null, null, null, null, null],
+        [0, null, null, null, null, null],
+        [0, null, null, null, null, null],
+        [0, null, null, null, null, null],
+      ],
+    },
+    {
+      gameOver: true,
+      winner: 0,
+    },
+  ],
+  [
+    {
+      board: [
+        [null, null, null, null, null, null],
+        [null, 0, null, null, null, null],
+        [null, 0, null, null, null, null],
+        [null, 0, null, null, null, null],
+        [null, 0, null, null, null, null],
+        [null, null, null, null, null, null],
+      ],
+    },
+    {
+      gameOver: true,
+      winner: 0,
+    },
+  ],
+  [
+    {
+      board: [
+        [null, null, null, null, null, null],
+        [null, 1, null, null, null, null],
+        [null, 1, null, null, null, null],
+        [null, 1, null, null, null, null],
+        [null, 1, null, null, null, null],
+        [null, null, null, null, null, null],
+      ],
+    },
+    {
+      gameOver: true,
+      winner: 1,
+    },
+  ],
+  [
+    {
+      board: [
+        [null, null, null, null, null, null],
+        [null, null, null, null, null, null],
+        [null, null, null, null, null, null],
+        [null, null, null, null, null, null],
+        [null, null, null, null, null, null],
+        [0, 0, 0, null, 0, null],
+      ],
+    },
+    {
+      gameOver: false,
+      winner: undefined,
+    },
+  ],
+  [
+    {
+      board: [
+        [null, null, null, null, null, null],
+        [null, null, null, null, null, null],
+        [null, null, null, null, null, null],
+        [null, null, null, null, null, null],
+        [null, null, null, null, null, null],
+        [0, 0, 0, 0, null, null],
+      ],
+    },
+    {
+      gameOver: true,
+      winner: 0,
+    },
+  ],
+  [
+    {
+      board: [
+        [null, null, null, null, null, null],
+        [null, null, null, null, null, null],
+        [null, null, null, null, null, null],
+        [null, null, null, null, null, null],
+        [null, 0, 0, 0, 0, null],
+        [null, null, null, null, null, null],
+      ],
+    },
+    {
+      gameOver: true,
+      winner: 0,
+    },
+  ],
+  [
+    {
+      board: [
+        [null, null, null, null, null, null],
+        [null, null, null, null, 0, null],
+        [null, null, null, null, null, null],
+        [null, null, 0, null, null, null],
+        [null, 0, null, null, null, null],
+        [0, null, null, null, null, null],
+      ],
+    },
+    {
+      gameOver: false,
+      winner: null,
+    },
+  ],
+  [
+    {
+      board: [
+        [null, null, null, null, null, null],
+        [null, null, null, null, 0, null],
+        [null, null, null, 0, null, null],
+        [null, null, 0, null, null, null],
+        [null, 0, null, null, null, null],
+        [null, null, null, null, null, null],
+      ],
+    },
+    {
+      gameOver: true,
+      winner: 0,
+    },
+  ],
+  [
+    {
+      board: [
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, 0, null, null],
+        [null, null, null, 0, null, null, null],
+        [null, null, 0, null, null, null, null],
+        [null, 0, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+      ],
+    },
+    {
+      gameOver: true,
+      winner: 0,
+    },
+  ],
+  [
+    {
+      board: [
+        [null, null, null, null, null, null],
+        [null, 0, null, null, null, null],
+        [null, null, null, null, null, null],
+        [null, null, null, 0, null, null],
+        [null, null, null, null, 0, null],
+        [null, null, null, null, null, 0],
+      ],
+    },
+    {
+      gameOver: false,
+      winner: null,
+    },
+  ],
+  [
+    {
+      board: [
+        [null, null, null, null, null, null],
+        [null, null, null, null, null, null],
+        [null, null, 0, null, null, null],
+        [null, null, null, 0, null, null],
+        [null, null, null, null, 0, null],
+        [null, null, null, null, null, 0],
+      ],
+    },
+    {
+      gameOver: true,
+      winner: 0,
+    },
+  ],
+  [
+    {
+      board: [
+        [null, null, null, null, null, null],
+        [null, 0, null, null, null, null],
+        [null, null, 0, null, null, null],
+        [null, null, null, 0, null, null],
+        [null, null, null, null, 0, null],
+        [null, null, null, null, null, null],
+      ],
+    },
+    {
+      gameOver: true,
+      winner: 0,
+    },
+  ],
+  [
+    {
+      board: [
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, 0, null, null, null, null],
+        [null, null, null, 0, null, null, null],
+        [null, null, null, null, 0, null, null],
+        [null, null, null, null, null, 0, null],
+        [null, null, null, null, null, null, null],
+      ],
+    },
+    {
+      gameOver: true,
+      winner: 0,
+    },
+  ],
+  [
+    {
+      board: [
+        [0, 0, 1, 0, 0, 1],
+        [0, 0, 1, 0, 0, 1],
+        [0, 0, 1, 0, 0, 1],
+        [1, 1, 0, 1, 1, 0],
+        [1, 1, 0, 1, 1, 0],
+        [1, 1, 0, 1, 1, 0],
+      ],
+    },
+    {
+      gameOver: true,
+      winner: undefined,
+    },
+  ],
 
-test.todo("checkWin on a board with 1 red doesn't change state");
+])('%#. checkWin returns the winner and game over state correctly', (board, expectedResult) => {
+  expect(checkWin(board)).toEqual(expectedResult);
+});
 
-test.todo("checkWin on a board with 4 reds not in a row doesn't change state");
-
-test.todo('checkWin on a board with 4 reds in a row changes state');
-
-test.todo('checkWin on a board with 4 yellows in a row changes state');
+// TODO: add moves to state
+// TODO: add test with multiple moves in list
+// TODO: test takeTurn uses checkWin
