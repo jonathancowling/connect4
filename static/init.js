@@ -19,6 +19,8 @@ const initialState = {
 initBoard(initialState);
 
 document.addEventListener('newstate', onNewStatePlaceCoinFactory(initCoin, placeCoin, getColor));
+document.addEventListener('newstate', onNewStateResetSelectedColumnFactory());
+
 Array.from(document.querySelectorAll('.slot')).forEach((element, index) => {
   document.addEventListener('columnselected', onColumnSelectedSetHighlightFactory(index % numCols, element, {
     highlighted: 'lightgrey', unhighlighted: 'white',

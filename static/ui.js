@@ -52,6 +52,17 @@ function onNewStateSelectColumnFactory(/** @type {Node} */target, index) {
   };
 }
 
+function onNewStateResetSelectedColumnFactory() {
+  return () => {
+    document.dispatchEvent(new CustomEvent('columnselected', {
+      detail: {
+        state: null,
+        index: null,
+      },
+    }));
+  };
+}
+
 /**
  * @returns {Element}
  */
@@ -98,11 +109,13 @@ function onColumnSelectedTakeTurnFactory(target, takeTurn) {
   return (/** @type {CustomEvent} */ columnselectedEvent) => {
     target.removeEventListener('click', currentClickListener);
     currentClickListener = () => {
-      document.dispatchEvent(new CustomEvent('newstate', {
-        detail: {
-          state: takeTurn(columnselectedEvent.detail.state, columnselectedEvent.detail.index),
-        },
-      }));
+      if (columnselectedEvent.detail.index !== null) {
+        document.dispatchEvent(new CustomEvent('newstate', {
+          detail: {
+            state: takeTurn(columnselectedEvent.detail.state, columnselectedEvent.detail.index),
+          },
+        }));
+      }
     };
     target.addEventListener('click', currentClickListener);
   };
@@ -115,6 +128,7 @@ module.exports = {
   initBoard,
   onNewStatePlaceCoinFactory,
   onNewStateSelectColumnFactory,
+  onNewStateResetSelectedColumnFactory,
   initCoin,
   placeCoin,
   getColor,

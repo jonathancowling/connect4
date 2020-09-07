@@ -2,6 +2,7 @@ const {
   initBoard,
   onNewStatePlaceCoinFactory,
   onNewStateSelectColumnFactory,
+  onNewStateResetSelectedColumnFactory,
   initCoin,
   placeCoin,
   onColumnSelectedSetHighlightFactory,
@@ -211,7 +212,26 @@ describe('on new state', () => {
     },
   );
 
-  test.todo('selected column is reset');
+  test('selected column is reset', () => {
+    const e = new CustomEvent('newstate', {
+      target: jest.fn(),
+      detail: {
+        state: null,
+      },
+    });
+
+    onNewStateResetSelectedColumnFactory()(e);
+
+    expect(document.dispatchEvent.mock.calls).toEqual([
+      [expect.any(CustomEvent)],
+    ]);
+
+    expect(document.dispatchEvent.mock.calls[0][0].type).toEqual('columnselected');
+    expect(document.dispatchEvent.mock.calls[0][0].detail).toEqual({
+      index: null,
+      state: null,
+    });
+  });
 
   test('no coins are placed if there are no moves', () => {
     const e = new CustomEvent('newstate', {
@@ -360,6 +380,37 @@ describe('on column selected', () => {
     ]);
     expect(document.dispatchEvent.mock.calls[0][0].type).toBe('newstate');
     expect(document.dispatchEvent.mock.calls[0][0].detail).toEqual({ state: event2.detail.state });
+  });
+
+  test('the drop button removes takeTurn on click', () => {
+    const target = {
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    };
+    const expectedNewState = {};
+    const takeTurn = jest.fn().mockReturnValue(expectedNewState);
+
+    const state = {};
+    const index = null;
+    const event1 = new CustomEvent('columnselected', { detail: { index, state } });
+
+    const onColumnSelectedTakeTurn = onColumnSelectedTakeTurnFactory(target, takeTurn);
+
+    onColumnSelectedTakeTurn(event1);
+
+    expect(target.addEventListener.mock.calls).toEqual([
+      ['click', expect.any(Function)],
+    ]);
+
+    const firstClickListener = target.addEventListener.mock.calls[0][1];
+
+    expect(target.removeEventListener.mock.calls).toEqual([
+      ['click', undefined],
+    ]);
+
+    firstClickListener();
+
+    expect(takeTurn).not.toBeCalled();
   });
 });
 

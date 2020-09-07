@@ -31,6 +31,7 @@
                 "getColor": "readonly",
                 "onColumnSelectedSetHighlightFactory": "readonly",
                 "onNewStateSelectColumnFactory": "readonly",
+                "onNewStateResetSelectedColumnFactory": "readonly",
                 "onColumnSelectedTakeTurnFactory": "readonly",
                 "takeTurn": "readonly"
             },
