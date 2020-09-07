@@ -1,4 +1,4 @@
-const { takeTurn, ILLEGAL_MOVE_FULL_COLUMN, ILLEGAL_MOVE_COLUMN_DOESNT_EXIST } = require('./static/logic');
+const { takeTurn, ILLEGAL_MOVE_FULL_COLUMN, ILLEGAL_MOVE_COLUMN_DOESNT_EXIST } = require('../static/logic');
 
 describe('takeTurn', () => {
   it.each([

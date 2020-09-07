@@ -7,7 +7,7 @@ const {
   onColumnSelectedSetHighlightFactory,
   onColumnSelectedTakeTurnFactory,
   getColor,
-} = require('./static/ui');
+} = require('../static/ui');
 
 document.dispatchEvent = jest.fn();
 beforeEach(() => {
