@@ -34,10 +34,7 @@
                 "onNewStateResetSelectedColumnFactory": "readonly",
                 "onColumnSelectedTakeTurnFactory": "readonly",
                 "takeTurn": "readonly"
-            },
-            "plugins": [
-                "jest"
-            ]
+            }
         }
     ]
 }

@@ -26,10 +26,99 @@ function takeTurn(state, colIndex) {
   return newState;
 }
 
-// eslint-disable-next-line no-unused-vars
-function checkWin(_state) {
+function checkWin(state) {
+  const numRows = state.board.length;
+  if (numRows === 0) {
+    return {
+      gameOver: true,
+      winner: undefined,
+    };
+  }
+
+  const numCols = state.board[0].length;
+  if (numCols === 0) {
+    return {
+      gameOver: true,
+      winner: undefined,
+    };
+  }
+
+  if (state.moves.length === 0) {
+    return {
+      gameOver: false,
+      winner: undefined,
+    };
+  }
+
+  const [currentPlayer, rowIndex, colIndex] = state.moves[state.moves.length - 1];
+
+  for (let direction = 0; direction < 8; direction += 1) {
+    let rowIndicies;
+    let colIndicies;
+
+    switch (direction) {
+      case 0:
+        colIndicies = Array(4).fill(colIndex);
+        rowIndicies = Array(4).fill().map((_value, index) => rowIndex - index);
+        break;
+      case 1:
+        colIndicies = Array(4).fill().map((_value, index) => colIndex + index);
+        rowIndicies = Array(4).fill().map((_value, index) => rowIndex - index);
+        break;
+      case 2:
+        colIndicies = Array(4).fill().map((_value, index) => colIndex + index);
+        rowIndicies = Array(4).fill(rowIndex);
+        break;
+      case 3:
+        colIndicies = Array(4).fill().map((_value, index) => colIndex + index);
+        rowIndicies = Array(4).fill().map((_value, index) => rowIndex + index);
+        break;
+      case 4:
+        colIndicies = Array(4).fill(colIndex);
+        rowIndicies = Array(4).fill().map((_value, index) => rowIndex + index);
+        break;
+      case 5:
+        colIndicies = Array(4).fill().map((_value, index) => colIndex - index);
+        rowIndicies = Array(4).fill().map((_value, index) => rowIndex + index);
+        break;
+      case 6:
+        colIndicies = Array(4).fill().map((_value, index) => colIndex - index);
+        rowIndicies = Array(4).fill(rowIndex);
+        break;
+      case 7:
+        colIndicies = Array(4).fill().map((_value, index) => colIndex - index);
+        rowIndicies = Array(4).fill().map((_value, index) => rowIndex - index);
+        break;
+      // no default
+    }
+
+    const currentPlayerWon = rowIndicies
+      .map((_rowIndex, i) => [_rowIndex, colIndicies[i]])
+      .reduce((winningSoFar, [currentRowIndex, currentColIndex]) => {
+        if (!winningSoFar) {
+          return false;
+        }
+        if (currentRowIndex < 0 || currentRowIndex >= state.board.length) {
+          return false;
+        }
+        if (currentColIndex < 0 || currentColIndex >= state.board[0].length) {
+          return false;
+        }
+        return state.board[currentRowIndex][currentColIndex] === currentPlayer;
+      }, true);
+
+    if (currentPlayerWon) {
+      return {
+        gameOver: true,
+        winner: currentPlayer,
+      };
+    }
+  }
+
+  const boardIsFull = [].concat(...state.board).every((cell) => cell !== null);
+
   return {
-    gameOver: false,
+    gameOver: boardIsFull,
     winner: undefined,
   };
 }

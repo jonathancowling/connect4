@@ -187,23 +187,30 @@ describe('takeTurn', () => {
   });
 });
 
-test.skip.each([
+test.each([
   [
-    [],
+    { board: [], moves: [] },
     {
       gameOver: true,
       winner: undefined,
     },
   ],
   [
-    [[null]],
+    { board: [[]], moves: [] },
+    {
+      gameOver: true,
+      winner: undefined,
+    },
+  ],
+  [
+    { board: [[null]], moves: [] },
     {
       gameOver: false,
       winner: undefined,
     },
   ],
   [
-    [[0]],
+    { board: [[0]], moves: [[0, 0, 0]] },
     {
       gameOver: true,
       winner: undefined,
@@ -211,6 +218,7 @@ test.skip.each([
   ],
   [
     {
+      moves: [],
       board: [
         [null, null, null, null, null],
         [null, null, null, null, null],
@@ -226,6 +234,7 @@ test.skip.each([
   ],
   [
     {
+      moves: [[0, 5, 0], [0, 4, 0], [0, 3, 0], [0, 1, 0]],
       board: [
         [null, null, null, null, null, null],
         [0, null, null, null, null, null],
@@ -242,6 +251,7 @@ test.skip.each([
   ],
   [
     {
+      moves: [[0, 5, 0], [0, 4, 0], [0, 3, 0], [0, 2, 0]],
       board: [
         [null, null, null, null, null, null],
         [null, null, null, null, null, null],
@@ -258,6 +268,7 @@ test.skip.each([
   ],
   [
     {
+      moves: [[0, 4, 1], [0, 3, 1], [0, 2, 1], [0, 1, 1]],
       board: [
         [null, null, null, null, null, null],
         [null, 0, null, null, null, null],
@@ -274,6 +285,7 @@ test.skip.each([
   ],
   [
     {
+      moves: [[1, 4, 1], [1, 3, 1], [1, 2, 1], [1, 1, 1]],
       board: [
         [null, null, null, null, null, null],
         [null, 1, null, null, null, null],
@@ -290,6 +302,7 @@ test.skip.each([
   ],
   [
     {
+      moves: [[0, 5, 0], [0, 5, 1], [0, 5, 2], [0, 5, 4]],
       board: [
         [null, null, null, null, null, null],
         [null, null, null, null, null, null],
@@ -306,6 +319,7 @@ test.skip.each([
   ],
   [
     {
+      moves: [[0, 5, 0], [0, 5, 1], [0, 5, 2], [0, 5, 3]],
       board: [
         [null, null, null, null, null, null],
         [null, null, null, null, null, null],
@@ -322,6 +336,7 @@ test.skip.each([
   ],
   [
     {
+      moves: [[0, 4, 1], [0, 4, 2], [0, 4, 3], [0, 4, 4]],
       board: [
         [null, null, null, null, null, null],
         [null, null, null, null, null, null],
@@ -338,6 +353,7 @@ test.skip.each([
   ],
   [
     {
+      moves: [[0, 5, 0], [0, 4, 1], [0, 3, 2], [0, 1, 4]],
       board: [
         [null, null, null, null, null, null],
         [null, null, null, null, 0, null],
@@ -349,11 +365,12 @@ test.skip.each([
     },
     {
       gameOver: false,
-      winner: null,
+      winner: undefined,
     },
   ],
   [
     {
+      moves: [[0, 4, 1], [0, 3, 2], [0, 2, 3], [0, 1, 4]],
       board: [
         [null, null, null, null, null, null],
         [null, null, null, null, 0, null],
@@ -370,6 +387,7 @@ test.skip.each([
   ],
   [
     {
+      moves: [[0, 5, 1], [0, 4, 2], [0, 3, 3], [0, 2, 4]],
       board: [
         [null, null, null, null, null, null, null],
         [null, null, null, null, null, null, null],
@@ -387,6 +405,7 @@ test.skip.each([
   ],
   [
     {
+      moves: [[0, 1, 1], [0, 3, 3], [0, 4, 4], [0, 5, 5]],
       board: [
         [null, null, null, null, null, null],
         [null, 0, null, null, null, null],
@@ -398,11 +417,12 @@ test.skip.each([
     },
     {
       gameOver: false,
-      winner: null,
+      winner: undefined,
     },
   ],
   [
     {
+      moves: [[0, 2, 2], [0, 3, 3], [0, 4, 4], [0, 5, 5]],
       board: [
         [null, null, null, null, null, null],
         [null, null, null, null, null, null],
@@ -419,6 +439,7 @@ test.skip.each([
   ],
   [
     {
+      moves: [[0, 1, 1], [0, 2, 2], [0, 3, 3], [0, 4, 4]],
       board: [
         [null, null, null, null, null, null],
         [null, 0, null, null, null, null],
@@ -435,6 +456,7 @@ test.skip.each([
   ],
   [
     {
+      moves: [[0, 2, 2], [0, 3, 3], [0, 4, 4], [0, 5, 5]],
       board: [
         [null, null, null, null, null, null, null],
         [null, null, null, null, null, null, null],
@@ -452,6 +474,14 @@ test.skip.each([
   ],
   [
     {
+      moves: [
+        [0, 0, 0], [0, 0, 1], [1, 0, 2], [0, 0, 3], [0, 0, 4], [1, 0, 5],
+        [0, 1, 0], [0, 1, 1], [1, 1, 2], [0, 1, 3], [0, 1, 4], [1, 1, 5],
+        [0, 2, 0], [0, 2, 1], [1, 2, 2], [0, 2, 3], [0, 2, 4], [1, 2, 5],
+        [1, 3, 0], [1, 3, 1], [0, 3, 2], [1, 3, 3], [1, 3, 4], [0, 3, 5],
+        [1, 4, 0], [1, 4, 1], [0, 4, 2], [1, 4, 3], [1, 4, 4], [0, 4, 5],
+        [1, 5, 0], [1, 5, 1], [0, 5, 2], [1, 5, 3], [1, 5, 4], [0, 5, 5],
+      ],
       board: [
         [0, 0, 1, 0, 0, 1],
         [0, 0, 1, 0, 0, 1],
@@ -471,6 +501,4 @@ test.skip.each([
   expect(checkWin(board)).toEqual(expectedResult);
 });
 
-// TODO: add moves to state
-// TODO: add test with multiple moves in list
 // TODO: test takeTurn uses checkWin
