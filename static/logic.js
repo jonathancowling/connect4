@@ -1,30 +1,39 @@
-function takeTurn(state, colIndex) {
-  const newState = JSON.parse(JSON.stringify(state));
-  delete newState.error;
+function takeTurnFactory(checkWinFn) {
+  return (state, colIndex) => {
+    const newState = JSON.parse(JSON.stringify(state));
+    delete newState.error;
 
-  const col = newState.board.map((row) => row[colIndex]);
+    const col = newState.board.map((row) => row[colIndex]);
 
-  // get index of last empty row for given column
-  const rowIndex = col.length - 1 - col.reverse().findIndex((row) => row === null);
+    // get index of last empty row for given column
+    const rowIndex = col.length - 1 - col.reverse().findIndex((row) => row === null);
 
-  if (colIndex >= newState.board.length) {
-    // eslint-disable-next-line no-use-before-define
-    newState.error = ILLEGAL_MOVE_COLUMN_DOESNT_EXIST;
+    if (colIndex >= newState.board.length) {
+      // eslint-disable-next-line no-use-before-define
+      newState.error = ILLEGAL_MOVE_COLUMN_DOESNT_EXIST;
+      return newState;
+    }
+
+    if (rowIndex >= col.length) {
+      // eslint-disable-next-line no-use-before-define
+      newState.error = ILLEGAL_MOVE_FULL_COLUMN;
+      return newState;
+    }
+
+    newState.moves.push([state.player, rowIndex, colIndex]);
+    newState.board[rowIndex][colIndex] = state.player;
+    newState.player = (state.player + 1) % 2;
+
+    const { gameOver, winner } = checkWinFn(state);
+
+    newState.gameOver = gameOver;
+    newState.winner = winner;
+
     return newState;
-  }
-
-  if (rowIndex >= col.length) {
-    // eslint-disable-next-line no-use-before-define
-    newState.error = ILLEGAL_MOVE_FULL_COLUMN;
-    return newState;
-  }
-
-  newState.moves.push([state.player, rowIndex, colIndex]);
-  newState.board[rowIndex][colIndex] = state.player;
-  newState.player = (state.player + 1) % 2;
-
-  return newState;
+  };
 }
+
+const CONSECUTIVE_CELLS_TO_WIN = 4;
 
 function checkWin(state) {
   const numRows = state.board.length;
@@ -58,36 +67,64 @@ function checkWin(state) {
 
     switch (direction) {
       case 0:
-        colIndicies = Array(4).fill(colIndex);
-        rowIndicies = Array(4).fill().map((_value, index) => rowIndex - index);
+        colIndicies = Array(CONSECUTIVE_CELLS_TO_WIN)
+          .fill(colIndex);
+        rowIndicies = Array(CONSECUTIVE_CELLS_TO_WIN)
+          .fill()
+          .map((_value, index) => rowIndex - index);
         break;
       case 1:
-        colIndicies = Array(4).fill().map((_value, index) => colIndex + index);
-        rowIndicies = Array(4).fill().map((_value, index) => rowIndex - index);
+        colIndicies = Array(CONSECUTIVE_CELLS_TO_WIN)
+          .fill()
+          .map((_value, index) => colIndex + index);
+        rowIndicies = Array(CONSECUTIVE_CELLS_TO_WIN)
+          .fill()
+          .map((_value, index) => rowIndex - index);
         break;
       case 2:
-        colIndicies = Array(4).fill().map((_value, index) => colIndex + index);
-        rowIndicies = Array(4).fill(rowIndex);
+        colIndicies = Array(CONSECUTIVE_CELLS_TO_WIN)
+          .fill()
+          .map((_value, index) => colIndex + index);
+        rowIndicies = Array(CONSECUTIVE_CELLS_TO_WIN)
+          .fill(rowIndex);
         break;
       case 3:
-        colIndicies = Array(4).fill().map((_value, index) => colIndex + index);
-        rowIndicies = Array(4).fill().map((_value, index) => rowIndex + index);
+        colIndicies = Array(CONSECUTIVE_CELLS_TO_WIN)
+          .fill()
+          .map((_value, index) => colIndex + index);
+        rowIndicies = Array(CONSECUTIVE_CELLS_TO_WIN)
+          .fill()
+          .map((_value, index) => rowIndex + index);
         break;
       case 4:
-        colIndicies = Array(4).fill(colIndex);
-        rowIndicies = Array(4).fill().map((_value, index) => rowIndex + index);
+        colIndicies = Array(CONSECUTIVE_CELLS_TO_WIN)
+          .fill(colIndex);
+        rowIndicies = Array(CONSECUTIVE_CELLS_TO_WIN)
+          .fill()
+          .map((_value, index) => rowIndex + index);
         break;
       case 5:
-        colIndicies = Array(4).fill().map((_value, index) => colIndex - index);
-        rowIndicies = Array(4).fill().map((_value, index) => rowIndex + index);
+        colIndicies = Array(CONSECUTIVE_CELLS_TO_WIN)
+          .fill()
+          .map((_value, index) => colIndex - index);
+        rowIndicies = Array(CONSECUTIVE_CELLS_TO_WIN)
+          .fill()
+          .map((_value, index) => rowIndex + index);
         break;
       case 6:
-        colIndicies = Array(4).fill().map((_value, index) => colIndex - index);
-        rowIndicies = Array(4).fill(rowIndex);
+        colIndicies = Array(CONSECUTIVE_CELLS_TO_WIN)
+          .fill()
+          .map((_value, index) => colIndex - index);
+        rowIndicies = Array(CONSECUTIVE_CELLS_TO_WIN)
+          .fill(rowIndex);
         break;
       case 7:
-        colIndicies = Array(4).fill().map((_value, index) => colIndex - index);
-        rowIndicies = Array(4).fill().map((_value, index) => rowIndex - index);
+        colIndicies = Array(CONSECUTIVE_CELLS_TO_WIN)
+          .fill()
+          .map((_value, index) => colIndex - index);
+        rowIndicies = Array(CONSECUTIVE_CELLS_TO_WIN)
+          .fill()
+          .map((_value, index) => rowIndex - index);
         break;
       // no default
     }
@@ -130,7 +167,7 @@ const ILLEGAL_MOVE_COLUMN_DOESNT_EXIST = 0x2;
 // eslint-disable-next-line no-global-assign
 module = module || {};
 module.exports = {
-  takeTurn,
+  takeTurnFactory,
   checkWin,
   ILLEGAL_MOVE_COLUMN_DOESNT_EXIST,
   ILLEGAL_MOVE_FULL_COLUMN,

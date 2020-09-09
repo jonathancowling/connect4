@@ -29,7 +29,7 @@ Array.from(document.querySelectorAll('.slot')).forEach((element, index) => {
 
 document.addEventListener(
   'columnselected',
-  onColumnSelectedTakeTurnFactory(document.querySelector('#drop-button'), takeTurn),
+  onColumnSelectedTakeTurnFactory(document.querySelector('#drop-button'), takeTurnFactory(checkWin)),
 );
 
 document.dispatchEvent(new CustomEvent('newstate', { detail: { state: initialState } }));

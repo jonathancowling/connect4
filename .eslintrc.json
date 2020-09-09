@@ -33,7 +33,8 @@
                 "onNewStateSelectColumnFactory": "readonly",
                 "onNewStateResetSelectedColumnFactory": "readonly",
                 "onColumnSelectedTakeTurnFactory": "readonly",
-                "takeTurn": "readonly"
+                "takeTurnFactory": "readonly",
+                "checkWin": "readonly"
             }
         }
     ]

@@ -1,5 +1,5 @@
 const {
-  takeTurn,
+  takeTurnFactory,
   checkWin,
   ILLEGAL_MOVE_FULL_COLUMN,
   ILLEGAL_MOVE_COLUMN_DOESNT_EXIST,
@@ -14,9 +14,11 @@ describe('takeTurn', () => {
           [null, null],
         ],
         moves: [],
-        winner: null,
+        gameOver: false,
+        winner: undefined,
         player: 0,
       },
+      jest.fn(() => ({ gameOver: false, winner: undefined })),
       0,
       {
         board: [
@@ -24,7 +26,8 @@ describe('takeTurn', () => {
           [0, null],
         ],
         moves: [[0, 1, 0]],
-        winner: null,
+        gameOver: false,
+        winner: undefined,
         player: 1,
       },
     ],
@@ -35,9 +38,11 @@ describe('takeTurn', () => {
           [0, null],
         ],
         moves: [[0, 1, 0]],
-        winner: null,
+        gameOver: false,
+        winner: undefined,
         player: 0,
       },
+      jest.fn(() => ({ gameOver: false, winner: undefined })),
       0,
       {
         board: [
@@ -45,7 +50,8 @@ describe('takeTurn', () => {
           [0, null],
         ],
         moves: [[0, 1, 0], [0, 0, 0]],
-        winner: null,
+        gameOver: false,
+        winner: undefined,
         player: 1,
       },
     ],
@@ -56,16 +62,19 @@ describe('takeTurn', () => {
           [0, null],
         ],
         moves: [[0, 1, 0], [0, 0, 0]],
-        winner: null,
+        gameOver: false,
+        winner: undefined,
         player: 0,
       },
+      jest.fn(() => ({ gameOver: false, winner: undefined })),
       1,
       {
         board: [
           [0, null],
           [0, 0],
         ],
-        winner: null,
+        gameOver: false,
+        winner: undefined,
         moves: [[0, 1, 0], [0, 0, 0], [0, 1, 1]],
         player: 1,
       },
@@ -77,9 +86,11 @@ describe('takeTurn', () => {
           [0, 0],
         ],
         moves: [[0, 1, 0], [0, 0, 0], [0, 1, 1]],
-        winner: null,
+        gameOver: false,
+        winner: undefined,
         player: 0,
       },
+      jest.fn(() => ({ gameOver: false, winner: undefined })),
       1,
       {
         board: [
@@ -87,7 +98,8 @@ describe('takeTurn', () => {
           [0, 0],
         ],
         moves: [[0, 1, 0], [0, 0, 0], [0, 1, 1], [0, 0, 1]],
-        winner: null,
+        gameOver: false,
+        winner: undefined,
         player: 1,
       },
     ],
@@ -95,11 +107,14 @@ describe('takeTurn', () => {
       {
         board: [
           [0, null],
-          [0, null]],
-        winner: null,
+          [0, null],
+        ],
+        gameOver: false,
+        winner: undefined,
         moves: [[0, 1, 0], [0, 0, 0]],
         player: 1,
       },
+      jest.fn(() => ({ gameOver: false, winner: undefined })),
       1,
       {
         board: [
@@ -107,12 +122,37 @@ describe('takeTurn', () => {
           [0, 1],
         ],
         moves: [[0, 1, 0], [0, 0, 0], [1, 1, 1]],
-        winner: null,
+        gameOver: false,
+        winner: undefined,
         player: 0,
       },
     ],
-  ])('correctly updates board and player (happy path)', (initialState, col, expectedState) => {
-    expect(takeTurn(initialState, col)).toEqual(expectedState);
+    [
+      {
+        board: [
+          [0, null],
+          [0, null],
+        ],
+        gameOver: false,
+        winner: undefined,
+        moves: [[0, 1, 0], [0, 0, 0]],
+        player: 1,
+      },
+      jest.fn(() => ({ gameOver: true, winner: 0 })),
+      1,
+      {
+        board: [
+          [0, null],
+          [0, 1],
+        ],
+        moves: [[0, 1, 0], [0, 0, 0], [1, 1, 1]],
+        gameOver: true,
+        winner: 0,
+        player: 0,
+      },
+    ],
+  ])('%#. correctly updates board and player (happy path)', (initialState, mockCheckWin, col, expectedState) => {
+    expect(takeTurnFactory(mockCheckWin)(initialState, col)).toEqual(expectedState);
   });
 
   it('sets full column error if coin placed on full column', () => {
@@ -120,7 +160,8 @@ describe('takeTurn', () => {
       board: [
         [0],
       ],
-      winner: null,
+      gameOver: false,
+      winner: undefined,
       moves: [],
       player: 0,
     };
@@ -130,12 +171,13 @@ describe('takeTurn', () => {
         [0],
       ],
       moves: [],
-      winner: null,
+      gameOver: false,
+      winner: undefined,
       player: 0,
       error: ILLEGAL_MOVE_FULL_COLUMN,
     };
 
-    expect(takeTurn(initialState, 0)).toEqual(expectedState);
+    expect(takeTurnFactory()(initialState, 0)).toEqual(expectedState);
   });
 
   it('sets no column exists error if coin placed on a column that doesn\'t exists', () => {
@@ -144,7 +186,8 @@ describe('takeTurn', () => {
         [null],
       ],
       moves: [],
-      winner: null,
+      gameOver: false,
+      winner: undefined,
       player: 0,
     };
 
@@ -152,13 +195,16 @@ describe('takeTurn', () => {
       board: [
         [null],
       ],
-      winner: null,
+      gameOver: false,
+      winner: undefined,
       player: 0,
       moves: [],
       error: ILLEGAL_MOVE_COLUMN_DOESNT_EXIST,
     };
 
-    expect(takeTurn(initialState, 1)).toEqual(expectedState);
+    const mockCheckWin = jest.fn(() => ({ gameOver: false, winner: undefined }));
+
+    expect(takeTurnFactory(mockCheckWin)(initialState, 1)).toEqual(expectedState);
   });
 
   it('clears error on legal move', () => {
@@ -168,7 +214,8 @@ describe('takeTurn', () => {
         [null, null],
       ],
       moves: [],
-      winner: null,
+      gameOver: false,
+      winner: undefined,
       player: 0,
       error: ILLEGAL_MOVE_FULL_COLUMN,
     };
@@ -179,11 +226,14 @@ describe('takeTurn', () => {
         [0, null],
       ],
       moves: [[0, 1, 0]],
-      winner: null,
+      gameOver: false,
+      winner: undefined,
       player: 1,
     };
 
-    expect(takeTurn(initialState, 0)).toEqual(expectedState);
+    const mockCheckWin = jest.fn(() => ({ gameOver: false, winner: undefined }));
+
+    expect(takeTurnFactory(mockCheckWin)(initialState, 0)).toEqual(expectedState);
   });
 });
 
@@ -500,5 +550,3 @@ test.each([
 ])('%#. checkWin returns the winner and game over state correctly', (board, expectedResult) => {
   expect(checkWin(board)).toEqual(expectedResult);
 });
-
-// TODO: test takeTurn uses checkWin
