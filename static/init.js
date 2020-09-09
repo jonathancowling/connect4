@@ -26,10 +26,16 @@ Array.from(document.querySelectorAll('.slot')).forEach((element, index) => {
   }));
   document.addEventListener('newstate', onNewStateSelectColumnFactory(element, index % numCols));
 });
+document.addEventListener('newstate', onNewStateMaybeEmitGameOver);
+document.addEventListener('gameover', onGameOverShowWinnerFactory(getColor));
 
 document.addEventListener(
   'columnselected',
   onColumnSelectedTakeTurnFactory(document.querySelector('#drop-button'), takeTurnFactory(checkWin)),
 );
+
+document.querySelector('#reset-button', () => {
+  document.dispatchEvent(new CustomEvent('newstate', { detail: { state: initialState } }));
+});
 
 document.dispatchEvent(new CustomEvent('newstate', { detail: { state: initialState } }));

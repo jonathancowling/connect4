@@ -32,6 +32,8 @@
                 "onColumnSelectedSetHighlightFactory": "readonly",
                 "onNewStateSelectColumnFactory": "readonly",
                 "onNewStateResetSelectedColumnFactory": "readonly",
+                "onNewStateMaybeEmitGameOver": "readonly",
+                "onGameOverShowWinnerFactory": "readonly",
                 "onColumnSelectedTakeTurnFactory": "readonly",
                 "takeTurnFactory": "readonly",
                 "checkWin": "readonly"

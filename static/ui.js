@@ -109,6 +109,7 @@ function onColumnSelectedTakeTurnFactory(target, takeTurn) {
   return (/** @type {CustomEvent} */ columnselectedEvent) => {
     target.removeEventListener('click', currentClickListener);
     currentClickListener = () => {
+      // FIXME: only if game's not over
       if (columnselectedEvent.detail.index !== null) {
         document.dispatchEvent(new CustomEvent('newstate', {
           detail: {
@@ -121,6 +122,29 @@ function onColumnSelectedTakeTurnFactory(target, takeTurn) {
   };
 }
 
+function onNewStateMaybeEmitGameOver(event) {
+  const { detail: { state } } = event;
+  if (state.gameOver) {
+    document.dispatchEvent(new CustomEvent('gameover', {
+      detail: {
+        winner: state.winner,
+      },
+    }));
+  }
+}
+
+function onGameOverShowWinnerFactory(getWinnerName) {
+  return (event) => {
+    const notification = document.createElement('p');
+    notification.innerHTML = `${getWinnerName(event.detail.winner)} wins!`;
+    const notificationPanel = document.querySelector('#notification-panel');
+    notificationPanel.appendChild(notification);
+    setTimeout(() => {
+      notificationPanel.removeChild(notification);
+    }, 3000);
+  };
+}
+
 /* istanbul ignore next */
 // eslint-disable-next-line no-global-assign
 module = module || {};
@@ -129,9 +153,11 @@ module.exports = {
   onNewStatePlaceCoinFactory,
   onNewStateSelectColumnFactory,
   onNewStateResetSelectedColumnFactory,
+  onNewStateMaybeEmitGameOver,
   initCoin,
   placeCoin,
   getColor,
   onColumnSelectedSetHighlightFactory,
   onColumnSelectedTakeTurnFactory,
+  onGameOverShowWinnerFactory,
 };

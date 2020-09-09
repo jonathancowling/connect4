@@ -24,6 +24,7 @@ function takeTurnFactory(checkWinFn) {
     newState.board[rowIndex][colIndex] = state.player;
     newState.player = (state.player + 1) % 2;
 
+    // FIXME: this should be new state
     const { gameOver, winner } = checkWinFn(state);
 
     newState.gameOver = gameOver;

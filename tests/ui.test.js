@@ -3,11 +3,13 @@ const {
   onNewStatePlaceCoinFactory,
   onNewStateSelectColumnFactory,
   onNewStateResetSelectedColumnFactory,
+  onNewStateMaybeEmitGameOver,
   initCoin,
   placeCoin,
   onColumnSelectedSetHighlightFactory,
   onColumnSelectedTakeTurnFactory,
   getColor,
+  onGameOverShowWinnerFactory,
 } = require('../static/ui');
 
 document.dispatchEvent = jest.fn();
@@ -212,6 +214,65 @@ describe('on new state', () => {
     },
   );
 
+  test.each([
+    [
+      {
+        board: [
+          [1, null],
+          [0, 1],
+        ],
+        winner: undefined,
+        gameOver: false,
+        player: 0,
+        moves: [[0, 1, 0], [1, 1, 0], [1, 1, 1]],
+      },
+    ],
+    [
+      {
+        board: [
+          [1, null],
+          [0, 1],
+        ],
+        winner: undefined,
+        gameOver: true,
+        player: 0,
+        moves: [[0, 1, 0], [1, 1, 0], [1, 1, 1]],
+      },
+    ],
+    [
+      {
+        board: [
+          [1, null],
+          [0, 1],
+        ],
+        winner: 0,
+        gameOver: true,
+        player: 0,
+        moves: [[0, 1, 0], [1, 1, 0], [1, 1, 1]],
+      },
+    ],
+  ])('%#. if there\'s a winner, emit a gameover event', (state) => {
+    const e = new CustomEvent('newstate', {
+      target: jest.fn(),
+      detail: { state },
+    });
+
+    onNewStateMaybeEmitGameOver(e);
+
+    if (state.gameOver) {
+      expect(document.dispatchEvent.mock.calls).toEqual([
+        [expect.any(CustomEvent)],
+      ]);
+
+      expect(document.dispatchEvent.mock.calls[0][0].type).toEqual('gameover');
+      expect(document.dispatchEvent.mock.calls[0][0].detail).toEqual({
+        winner: state.winner,
+      });
+    } else {
+      expect(document.dispatchEvent).not.toBeCalled();
+    }
+  });
+
   test('selected column is reset', () => {
     const e = new CustomEvent('newstate', {
       target: jest.fn(),
@@ -304,6 +365,35 @@ describe('on new state', () => {
       state: event2.detail.state,
       index: expectedIndex,
     });
+  });
+});
+
+describe('on game over', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    document.body.innerHTML = '';
+  });
+
+  test('notification shown for a fixed amount of time', () => {
+    const mockGetColor = jest.fn(() => 'red');
+    const winner = 0;
+
+    const notificationPanel = document.createElement('section');
+    notificationPanel.id = 'notification-panel';
+    document.body.appendChild(notificationPanel);
+
+    onGameOverShowWinnerFactory(mockGetColor)(new CustomEvent('gameover', {
+      detail: { winner },
+    }));
+    expect(mockGetColor.mock.calls).toEqual([
+      [winner],
+    ]);
+
+    expect(notificationPanel.firstElementChild.innerHTML).toBe('red wins!');
+
+    jest.advanceTimersByTime(3000);
+
+    expect(notificationPanel.hasChildNodes()).toBe(false);
   });
 });
 
