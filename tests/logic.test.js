@@ -153,6 +153,16 @@ describe('takeTurn', () => {
     ],
   ])('%#. correctly updates board and player (happy path)', (initialState, mockCheckWin, col, expectedState) => {
     expect(takeTurnFactory(mockCheckWin)(initialState, col)).toEqual(expectedState);
+
+    const checkWinState = {
+      player: expectedState.player,
+      moves: expectedState.moves,
+      board: expectedState.board,
+    };
+
+    expect(mockCheckWin.mock.calls).toEqual([
+      [checkWinState],
+    ]);
   });
 
   it('sets full column error if coin placed on full column', () => {

@@ -40,6 +40,12 @@ function onNewStateSelectColumnFactory(/** @type {Node} */target, index) {
 
   return (/** @type {CustomEvent} */ newStateEvent) => {
     target.removeEventListener('click', currentClickListener);
+
+    if (newStateEvent.detail.state.gameOver) {
+      currentClickListener = undefined;
+      return;
+    }
+
     currentClickListener = () => {
       document.dispatchEvent(new CustomEvent('columnselected', {
         detail: {
@@ -109,7 +115,6 @@ function onColumnSelectedTakeTurnFactory(target, takeTurn) {
   return (/** @type {CustomEvent} */ columnselectedEvent) => {
     target.removeEventListener('click', currentClickListener);
     currentClickListener = () => {
-      // FIXME: only if game's not over
       if (columnselectedEvent.detail.index !== null) {
         document.dispatchEvent(new CustomEvent('newstate', {
           detail: {

@@ -1,36 +1,37 @@
+const ILLEGAL_MOVE_FULL_COLUMN = 0x1;
+const ILLEGAL_MOVE_COLUMN_DOESNT_EXIST = 0x2;
+
 function takeTurnFactory(checkWinFn) {
   return (state, colIndex) => {
-    const newState = JSON.parse(JSON.stringify(state));
-    delete newState.error;
-
-    const col = newState.board.map((row) => row[colIndex]);
+    const col = state.board.map((row) => row[colIndex]);
 
     // get index of last empty row for given column
     const rowIndex = col.length - 1 - col.reverse().findIndex((row) => row === null);
 
-    if (colIndex >= newState.board.length) {
-      // eslint-disable-next-line no-use-before-define
-      newState.error = ILLEGAL_MOVE_COLUMN_DOESNT_EXIST;
-      return newState;
+    if (colIndex >= state.board.length) {
+      return {
+        ...JSON.parse(JSON.stringify(state)),
+        error: ILLEGAL_MOVE_COLUMN_DOESNT_EXIST,
+      };
     }
 
     if (rowIndex >= col.length) {
-      // eslint-disable-next-line no-use-before-define
-      newState.error = ILLEGAL_MOVE_FULL_COLUMN;
-      return newState;
+      return {
+        ...JSON.parse(JSON.stringify(state)),
+        error: ILLEGAL_MOVE_FULL_COLUMN,
+      };
     }
 
-    newState.moves.push([state.player, rowIndex, colIndex]);
-    newState.board[rowIndex][colIndex] = state.player;
-    newState.player = (state.player + 1) % 2;
+    const moves = state.moves.concat([[state.player, rowIndex, colIndex]]);
+    const board = JSON.parse(JSON.stringify(state.board));
+    board[rowIndex][colIndex] = state.player;
+    const player = (state.player + 1) % 2;
 
-    // FIXME: this should be new state
-    const { gameOver, winner } = checkWinFn(state);
+    const { gameOver, winner } = checkWinFn({ moves, board, player });
 
-    newState.gameOver = gameOver;
-    newState.winner = winner;
-
-    return newState;
+    return {
+      moves, board, player, gameOver, winner,
+    };
   };
 }
 
@@ -160,9 +161,6 @@ function checkWin(state) {
     winner: undefined,
   };
 }
-
-const ILLEGAL_MOVE_FULL_COLUMN = 0x1;
-const ILLEGAL_MOVE_COLUMN_DOESNT_EXIST = 0x2;
 
 /* istanbul ignore next */
 // eslint-disable-next-line no-global-assign

@@ -366,6 +366,45 @@ describe('on new state', () => {
       index: expectedIndex,
     });
   });
+
+  test('if game over columnselected emiting click listeners are removed', () => {
+    const event1 = new CustomEvent('newstate', {
+      detail: {
+        state: {
+          gameOver: false,
+        },
+      },
+    });
+    const event2 = new CustomEvent('newstate', {
+      detail: {
+        state: {
+          gameOver: true,
+        },
+      },
+    });
+
+    const target = {
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    };
+
+    const expectedIndex = 0;
+
+    const selectColumn = onNewStateSelectColumnFactory(target, expectedIndex);
+    selectColumn(event1);
+    selectColumn(event2);
+
+    expect(target.addEventListener.mock.calls).toEqual([
+      ['click', expect.any(Function)],
+    ]);
+
+    const firstClickListener = target.addEventListener.mock.calls[0][1];
+
+    expect(target.removeEventListener.mock.calls).toEqual([
+      ['click', undefined],
+      ['click', firstClickListener],
+    ]);
+  });
 });
 
 describe('on game over', () => {
@@ -426,7 +465,7 @@ describe('on column selected', () => {
     expect(target.style.backgroundColor).toBe(unhighlighted);
   });
 
-  test('the drop button replaces takeTurn on click', () => {
+  test('when a column is selected the drop button replaces takeTurn on click', () => {
     const target = {
       addEventListener: jest.fn(),
       removeEventListener: jest.fn(),
@@ -472,7 +511,7 @@ describe('on column selected', () => {
     expect(document.dispatchEvent.mock.calls[0][0].detail).toEqual({ state: event2.detail.state });
   });
 
-  test('the drop button removes takeTurn on click', () => {
+  test('when no column is selected the drop button removes takeTurn on click', () => {
     const target = {
       addEventListener: jest.fn(),
       removeEventListener: jest.fn(),
