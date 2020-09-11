@@ -34,8 +34,10 @@ document.addEventListener(
   onColumnSelectedTakeTurnFactory(document.querySelector('#drop-button'), takeTurnFactory(checkWin)),
 );
 
-document.querySelector('#reset-button', () => {
-  document.dispatchEvent(new CustomEvent('newstate', { detail: { state: initialState } }));
+document.querySelector('#reset-button').addEventListener('click', () => {
+  document.dispatchEvent(new CustomEvent('reset', {
+    detail: { initialState },
+  }));
 });
 
 document.dispatchEvent(new CustomEvent('newstate', { detail: { state: initialState } }));
