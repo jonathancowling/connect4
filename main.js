@@ -14,7 +14,12 @@ const app = express();
 const gameApi = new express.Router();
 
 gameApi.use(express.json());
-gameApi.use(session());
+gameApi.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false },
+}));
 
 const initialState = {
   board: Array(parseInt(process.env.NUM_ROWS, 10)).fill(undefined)
@@ -32,12 +37,22 @@ gameApi.post('/', (req, res) => {
   res.json(req.session.game);
 });
 
+gameApi.delete('/', (req, res) => {
+  req.session.game = null;
+  res.status(204).end();
+});
+
 gameApi.get('/', (req, res) => {
   res.json(req.session.game);
 });
 
 gameApi.post('/move', (req, res) => {
-  req.session.game.state = takeTurn(req.session.game.state, req.body.col);
+  const newState = takeTurn(req.session.game.state, parseInt(req.body.col, 10));
+  if (newState.error) {
+    res.sendStatus(400);
+    return;
+  }
+  req.session.game.state = newState;
   res.json(req.session.game);
 });
 
