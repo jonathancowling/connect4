@@ -55,7 +55,7 @@ describe('placeCoin', () => {
   beforeAll(() => {
     board = document.createElement('div');
     board.setAttribute('id', 'main-game');
-    Array(4).fill(undefined).forEach(() => {
+    Array(5).fill(undefined).forEach(() => {
       const slot = document.createElement('div');
       slot.classList.add('slot');
       slots.push(slot);
@@ -64,22 +64,36 @@ describe('placeCoin', () => {
     document.body.appendChild(board);
   });
 
-  const coin1 = document.createElement('div');
-  const coin2 = document.createElement('div');
-  const coin3 = document.createElement('div');
-  const coin4 = document.createElement('div');
+  const coins = [
+    document.createElement('div'),
+    document.createElement('div'),
+    document.createElement('div'),
+    document.createElement('div'),
+    null,
+    document.createElement('div'),
+  ];
 
   it.each([
-    [coin1, 0, [coin1, null, null, null]],
-    [coin2, 1, [coin1, coin2, null, null]],
-    [coin3, 2, [coin1, coin2, coin3, null]],
-    [coin4, 3, [coin1, coin2, coin3, coin4]],
-  ])('places coins in the correct cells', (coin, index, expected) => {
+    [coins[0], 0, [[coins[0], 1], [null, 0], [null, 0], [null, 0], [null, 0]]],
+    [coins[1], 1, [[coins[0], 1], [coins[1], 1], [null, 0], [null, 0], [null, 0]]],
+    [coins[2], 2, [[coins[0], 1], [coins[1], 1], [coins[2], 1], [null, 0], [null, 0]]],
+    [coins[3], 3, [[coins[0], 1], [coins[1], 1], [coins[2], 1], [coins[3], 1], [null, 0]]],
+    [coins[4], 3, [[coins[0], 1], [coins[1], 1], [coins[2], 1], [coins[4], 0], [null, 0]]],
+    [coins[5], 1, [[coins[0], 1], [coins[5], 1], [coins[2], 1], [coins[4], 0], [null, 0]]],
+  ])('%#. places coins in the correct cells', (coin, index, expected) => {
     placeCoin(coin, index);
-    expect(slots[0].firstElementChild).toBe(expected[0]);
-    expect(slots[1].firstElementChild).toBe(expected[1]);
-    expect(slots[2].firstElementChild).toBe(expected[2]);
-    expect(slots[3].firstElementChild).toBe(expected[3]);
+
+    expect(slots[0].childElementCount).toBe(expected[0][1]);
+    expect(slots[1].childElementCount).toBe(expected[1][1]);
+    expect(slots[2].childElementCount).toBe(expected[2][1]);
+    expect(slots[3].childElementCount).toBe(expected[3][1]);
+    expect(slots[4].childElementCount).toBe(expected[4][1]);
+
+    expect(slots[0].firstElementChild).toBe(expected[0][0]);
+    expect(slots[1].firstElementChild).toBe(expected[1][0]);
+    expect(slots[2].firstElementChild).toBe(expected[2][0]);
+    expect(slots[3].firstElementChild).toBe(expected[3][0]);
+    expect(slots[4].firstElementChild).toBe(expected[4][0]);
   });
 });
 
@@ -188,29 +202,29 @@ describe('on new state', () => {
       3,
     ],
   ])(
-    'coins are placed in the correct places',
-    (state, expectedCoinLocation) => {
+    '%#. coins are placed in the correct places',
+    (state) => {
       const e = new CustomEvent('newstate', {
         target: jest.fn(),
         detail: { state },
       });
 
-      const mockCoin = jest.fn();
-      const mockInitCoin = jest.fn(() => mockCoin);
+      const mockInitCoin = jest.fn(() => jest.fn());
       const mockPlaceCoin = jest.fn();
-      const mockSelectColumnFactory = jest.fn();
       const mockGetColor = jest.fn();
 
-      const listener = jest.fn();
-
-      mockSelectColumnFactory.mockImplementation(() => listener);
       mockGetColor.mockReturnValue('bg-color');
+
+      const cells = state.board.flat();
 
       onNewStatePlaceCoinFactory(mockInitCoin, mockPlaceCoin, mockGetColor)(e);
 
-      expect(mockInitCoin.mock.calls).toEqual([['bg-color']]);
-      expect(mockGetColor.mock.calls).toEqual([[state.moves[state.moves.length - 1][0]]]);
-      expect(mockPlaceCoin.mock.calls).toEqual([[mockCoin, expectedCoinLocation]]);
+      expect(mockGetColor.mock.calls).toEqual(cells.map((player) => [player]));
+      expect(mockInitCoin.mock.calls).toEqual(cells.map(() => ['bg-color']));
+      expect(mockPlaceCoin.mock.calls).toEqual(cells.map((_player, index) => [
+        mockInitCoin.mock.results[index].value,
+        index,
+      ]));
     },
   );
 

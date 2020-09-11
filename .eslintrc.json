@@ -27,7 +27,7 @@
                 "initBoard": "readonly",
                 "onNewStatePlaceCoinFactory": "readonly",
                 "initCoin": "readonly",
-                "placeCoin": "readonly",
+                "setSlot": "readonly",
                 "getColor": "readonly",
                 "onColumnSelectedSetHighlightFactory": "readonly",
                 "onNewStateSelectColumnFactory": "readonly",

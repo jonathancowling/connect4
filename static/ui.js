@@ -19,11 +19,12 @@ function onNewStatePlaceCoinFactory(_initCoin, _placeCoin, _getColor) {
       return;
     }
 
-    const [player, row, col] = event.detail.state.moves[event.detail.state.moves.length - 1];
-
-    const rowOffset = row * event.detail.state.board[0].length;
-
-    _placeCoin(_initCoin(_getColor(player)), rowOffset + col);
+    event.detail.state.board.forEach((row, rowIndex) => {
+      row.forEach((player, colIndex) => {
+        const rowOffset = rowIndex * event.detail.state.board[0].length;
+        _placeCoin(_initCoin(_getColor(player)), rowOffset + colIndex);
+      });
+    });
   };
 }
 
@@ -84,11 +85,16 @@ function initCoin(color) {
   return coin;
 }
 
-function placeCoin(coin, index) {
-  document
+function setSlot(coin, index) {
+  const slot = document
     .querySelector('#main-game')
-    .querySelectorAll('.slot')[index]
-    .appendChild(coin);
+    .querySelectorAll('.slot')[index];
+
+  slot.innerHTML = '';
+
+  if (coin !== null) {
+    slot.appendChild(coin);
+  }
 }
 
 function onColumnSelectedSetHighlightFactory(
@@ -116,6 +122,7 @@ function onColumnSelectedTakeTurnFactory(target, takeTurn) {
     target.removeEventListener('click', currentClickListener);
     currentClickListener = () => {
       if (columnselectedEvent.detail.index !== null) {
+        // TODO: change this to call api
         document.dispatchEvent(new CustomEvent('newstate', {
           detail: {
             state: takeTurn(columnselectedEvent.detail.state, columnselectedEvent.detail.index),
@@ -160,7 +167,7 @@ module.exports = {
   onNewStateResetSelectedColumnFactory,
   onNewStateMaybeEmitGameOver,
   initCoin,
-  placeCoin,
+  placeCoin: setSlot,
   getColor,
   onColumnSelectedSetHighlightFactory,
   onColumnSelectedTakeTurnFactory,

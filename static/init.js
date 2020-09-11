@@ -1,7 +1,7 @@
 // TODO: test this separately by setting globals
 
-const numCols = 5;
-const numRows = 5;
+const numCols = 8;
+const numRows = 8;
 const board = [];
 
 Array(numRows).fill(undefined).forEach(() => {
@@ -17,7 +17,7 @@ const initialState = {
 
 initBoard(initialState);
 
-document.addEventListener('newstate', onNewStatePlaceCoinFactory(initCoin, placeCoin, getColor));
+document.addEventListener('newstate', onNewStatePlaceCoinFactory(initCoin, setSlot, getColor));
 document.addEventListener('newstate', onNewStateResetSelectedColumnFactory());
 
 Array.from(document.querySelectorAll('.slot')).forEach((element, index) => {
@@ -40,4 +40,5 @@ document.querySelector('#reset-button').addEventListener('click', () => {
   }));
 });
 
+// TODO: this should be set via request
 document.dispatchEvent(new CustomEvent('newstate', { detail: { state: initialState } }));
