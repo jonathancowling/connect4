@@ -36,7 +36,10 @@
                 "onGameOverShowWinnerFactory": "readonly",
                 "onColumnSelectedTakeTurnFactory": "readonly",
                 "takeTurnFactory": "readonly",
-                "checkWin": "readonly"
+                "checkWin": "readonly",
+                "INITIAL_STATE": "readonly",
+                "NUM_ROWS": "readonly",
+                "NUM_COLS": "readonly"
             }
         }
     ]

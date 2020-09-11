@@ -1,8 +1,8 @@
-function initBoard(state) {
+function initBoard(boardArray) {
   const board = document.querySelector('#main-game');
   const slot = document.querySelector('#slot-template').content;
 
-  state.board.forEach((row) => {
+  boardArray.forEach((row) => {
     const tr = document.createElement('tr');
     row.forEach(() => {
       const td = document.createElement('td');
@@ -15,6 +15,7 @@ function initBoard(state) {
 
 function onNewStatePlaceCoinFactory(_initCoin, _placeCoin, _getColor) {
   return (/** @type {CustomEvent} */ event) => {
+    // FIXME: remove this section
     if (event.detail.state.moves.length === 0) {
       return;
     }
@@ -22,6 +23,7 @@ function onNewStatePlaceCoinFactory(_initCoin, _placeCoin, _getColor) {
     event.detail.state.board.forEach((row, rowIndex) => {
       row.forEach((player, colIndex) => {
         const rowOffset = rowIndex * event.detail.state.board[0].length;
+        // FIXME: init coin if player !== null
         _placeCoin(_initCoin(_getColor(player)), rowOffset + colIndex);
       });
     });

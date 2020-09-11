@@ -54,7 +54,7 @@ describe('placeCoin', () => {
 
   beforeAll(() => {
     board = document.createElement('div');
-    board.setAttribute('id', 'main-game');
+    board.id = 'main-game';
     Array(5).fill(undefined).forEach(() => {
       const slot = document.createElement('div');
       slot.classList.add('slot');
@@ -136,7 +136,7 @@ describe('initBoard', () => {
     slotTemplate.content.appendChild(slotTemplateContent);
     document.body.appendChild(slotTemplate);
 
-    initBoard(state);
+    initBoard(state.board);
     expect(board.childElementCount).toBe(n);
     Array.from(board.children).forEach((row) => {
       expect(row.nodeName).toBe('TR');
