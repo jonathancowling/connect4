@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
+const morgan = require('morgan');
 require('dotenv').config();
 const {
   takeTurnFactory,
@@ -10,6 +11,7 @@ const {
 const takeTurn = takeTurnFactory(checkWin);
 
 const app = express();
+app.use(morgan('tiny'));
 
 const gameApi = new express.Router();
 
@@ -39,10 +41,14 @@ gameApi.post('/', (req, res) => {
 
 gameApi.delete('/', (req, res) => {
   req.session.game = null;
-  res.status(204).end();
+  res.sendStatus(204);
 });
 
 gameApi.get('/', (req, res) => {
+  if (!req.session.game) {
+    res.sendStatus(400);
+    return;
+  }
   res.json(req.session.game);
 });
 
@@ -61,5 +67,6 @@ app.use(express.static(path.join(process.cwd(), 'static')));
 app.use('/api/game', gameApi);
 
 app.listen(parseInt(process.env.PORT, 10), () => {
+  // eslint-disable-next-line no-console
   console.log(`server listening on port ${process.env.PORT}`);
 });
