@@ -1,9 +1,13 @@
+/**
+ * @jest-environment node
+ */
+
 const {
   takeTurnFactory,
   checkWin,
   ILLEGAL_MOVE_FULL_COLUMN,
   ILLEGAL_MOVE_COLUMN_DOESNT_EXIST,
-} = require('../static/logic');
+} = require('../logic');
 
 describe('takeTurn', () => {
   it.each([
