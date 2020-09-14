@@ -15,16 +15,14 @@ function initBoard(boardArray) {
 
 function onNewStatePlaceCoinFactory(_initCoin, _placeCoin, _getColor) {
   return (/** @type {CustomEvent} */ event) => {
-    // FIXME: remove this section
-    if (event.detail.state.moves.length === 0) {
-      return;
-    }
-
     event.detail.state.board.forEach((row, rowIndex) => {
       row.forEach((player, colIndex) => {
         const rowOffset = rowIndex * event.detail.state.board[0].length;
-        // FIXME: init coin if player !== null
-        _placeCoin(_initCoin(_getColor(player)), rowOffset + colIndex);
+        if (player === null) {
+          _placeCoin(null, rowOffset + colIndex);
+        } else {
+          _placeCoin(_initCoin(_getColor(player)), rowOffset + colIndex);
+        }
       });
     });
   };

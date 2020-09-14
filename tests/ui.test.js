@@ -166,7 +166,6 @@ describe('on new state', () => {
         player: 0,
         moves: [[0, 0, 0]],
       },
-      0,
     ],
     [
       {
@@ -175,7 +174,6 @@ describe('on new state', () => {
         player: 0,
         moves: [[0, 0, 0], [1, 0, 1]],
       },
-      1,
     ],
     [
       {
@@ -187,7 +185,6 @@ describe('on new state', () => {
         player: 0,
         moves: [[0, 1, 0], [1, 0, 0]],
       },
-      0,
     ],
     [
       {
@@ -199,7 +196,14 @@ describe('on new state', () => {
         player: 0,
         moves: [[0, 1, 0], [1, 1, 0], [1, 1, 1]],
       },
-      3,
+    ],
+    [
+      {
+        board: [[0]],
+        winner: null,
+        player: 0,
+        moves: [],
+      },
     ],
   ])(
     '%#. coins are placed in the correct places',
@@ -219,12 +223,28 @@ describe('on new state', () => {
 
       onNewStatePlaceCoinFactory(mockInitCoin, mockPlaceCoin, mockGetColor)(e);
 
-      expect(mockGetColor.mock.calls).toEqual(cells.map((player) => [player]));
-      expect(mockInitCoin.mock.calls).toEqual(cells.map(() => ['bg-color']));
-      expect(mockPlaceCoin.mock.calls).toEqual(cells.map((_player, index) => [
-        mockInitCoin.mock.results[index].value,
-        index,
-      ]));
+      expect(mockGetColor.mock.calls).toEqual(
+        cells.filter((player) => player !== null).map((player) => [player]),
+      );
+      expect(mockInitCoin.mock.calls).toEqual(
+        cells.filter((player) => player !== null).map(() => ['bg-color']),
+      );
+
+      const entries = cells.map((player, location) => [player, location]);
+      const mockPlaceCoinNonNullCoins = entries
+        .filter(([player]) => player !== null)
+        .map(([, location], index) => [mockInitCoin.mock.results[index].value, location]);
+
+      const mockPlaceCoinNullCoins = entries
+        .filter(([player]) => player === null)
+        .map(([, location]) => [null, location]);
+
+      const expectedMockPlaceCoinCalls = [
+        ...mockPlaceCoinNonNullCoins,
+        ...mockPlaceCoinNullCoins,
+      ].sort(([, leftLocation], [, rightLocation]) => leftLocation - rightLocation);
+
+      expect(mockPlaceCoin.mock.calls).toEqual(expectedMockPlaceCoinCalls);
     },
   );
 
