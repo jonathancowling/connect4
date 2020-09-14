@@ -1,26 +1,26 @@
-initBoard(INITIAL_STATE.board);
-
 document.addEventListener('newstate', onNewStatePlaceCoinFactory(initCoin, setSlot, getColor));
 document.addEventListener('newstate', onNewStateResetSelectedColumnFactory());
 document.addEventListener('newstate', onNewStateMaybeEmitGameOver);
 document.addEventListener('gameover', onGameOverShowWinnerFactory(getColor));
 document.addEventListener(
   'columnselected',
-  onColumnSelectedTakeTurnFactory(document.querySelector('#drop-button'), takeTurnFactory(checkWin)),
+  onColumnSelectedTakeTurnFactory(document.querySelector('#drop-button'), takeTurn),
 );
 
-document.querySelector('#reset-button').addEventListener('click', () => {
-  document.dispatchEvent(new CustomEvent('newstate', {
-    detail: { state: INITIAL_STATE },
-  }));
-});
+getInitialState().then((initialState) => {
+  initBoard(initialState.board);
 
-Array.from(document.querySelectorAll('.slot')).forEach((element, index) => {
-  document.addEventListener('columnselected', onColumnSelectedSetHighlightFactory(index % NUM_COLS, element, {
-    highlighted: 'lightgrey', unhighlighted: 'white',
-  }));
-  document.addEventListener('newstate', onNewStateSelectColumnFactory(element, index % NUM_COLS));
-});
+  document.querySelector('#reset-button').addEventListener('click', () => {
+    document.dispatchEvent(new CustomEvent('newstate', {
+      detail: { state: initialState },
+    }));
+  });
 
-// TODO: this should be set via request
-document.dispatchEvent(new CustomEvent('newstate', { detail: { state: INITIAL_STATE } }));
+  Array.from(document.querySelectorAll('.slot')).forEach((element, index) => {
+    document.addEventListener('columnselected', onColumnSelectedSetHighlightFactory(index % initialState.board[0].length, element, {
+      highlighted: 'lightgrey', unhighlighted: 'white',
+    }));
+    document.addEventListener('newstate', onNewStateSelectColumnFactory(element, index % initialState.board[0].length));
+  });
+  document.dispatchEvent(new CustomEvent('newstate', { detail: { state: initialState } }));
+});

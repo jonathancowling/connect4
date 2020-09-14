@@ -3,6 +3,13 @@ describe('init', () => {
   let resetButton;
   let dropButton;
   const slots = [];
+  const initialState = {
+    board: [
+      [null, null, null],
+      [null, null, null],
+      [null, null, null],
+    ],
+  };
 
   beforeAll(() => {
     window.initBoard = jest.fn(() => ({}));
@@ -16,16 +23,9 @@ describe('init', () => {
     window.onNewStateSelectColumnFactory = jest.fn(() => ({}));
     window.onGameOverShowWinnerFactory = jest.fn(() => ({}));
     window.onColumnSelectedTakeTurnFactory = jest.fn(() => ({}));
-    window.takeTurnFactory = jest.fn(() => ({}));
+    window.takeTurn = jest.fn(() => ({}));
+    window.getInitialState = jest.fn(async () => initialState);
     window.checkWin = jest.fn(() => ({}));
-    window.INITIAL_STATE = {
-      board: [
-        [null, null, null],
-        [null, null, null],
-        [null, null, null],
-      ],
-    };
-    window.NUM_COLS = 3;
 
     resetButton = document.createElement('button');
     resetButton.id = 'reset-button';
@@ -53,10 +53,14 @@ describe('init', () => {
     document.addEventListener = jest.fn();
   });
 
-  test('', () => {
+  test('', async () => {
     require('../static/init.js');
 
-    expect(window.initBoard.mock.calls).toEqual([[window.INITIAL_STATE.board]]);
+    // wait for pending promises by scheduling this after init promises
+    await new Promise((resolve) => resolve());
+
+    expect(window.getInitialState).toHaveBeenCalledTimes(1);
+    expect(window.initBoard.mock.calls).toEqual([[initialState.board]]);
     expect(document.addEventListener).toBeCalledTimes(5 + 2 * slots.length);
     expect(document.addEventListener)
       .toBeCalledWith('newstate', window.onNewStatePlaceCoinFactory.mock.results[0].value);
@@ -71,7 +75,7 @@ describe('init', () => {
     expect(document.dispatchEvent).toBeCalledTimes(1);
     expect(document.dispatchEvent).toBeCalledWith(expect.any(CustomEvent));
     expect(document.dispatchEvent.mock.calls[0][0].type).toBe('newstate');
-    expect(document.dispatchEvent.mock.calls[0][0].detail).toEqual({ state: window.INITIAL_STATE });
+    expect(document.dispatchEvent.mock.calls[0][0].detail).toEqual({ state: initialState });
 
     expect(window.onNewStatePlaceCoinFactory).toBeCalledTimes(1);
     expect(window.onNewStatePlaceCoinFactory)
@@ -82,7 +86,7 @@ describe('init', () => {
     expect(window.onGameOverShowWinnerFactory).toBeCalledWith(window.getColor);
     expect(window.onColumnSelectedTakeTurnFactory).toBeCalledTimes(1);
     expect(window.onColumnSelectedTakeTurnFactory)
-      .toBeCalledWith(dropButton, window.takeTurnFactory.mock.results[0].value);
+      .toBeCalledWith(dropButton, window.takeTurn);
 
     expect(window.onColumnSelectedSetHighlightFactory).toBeCalledTimes(slots.length);
     expect(window.onNewStateSelectColumnFactory).toBeCalledTimes(slots.length);
@@ -96,7 +100,7 @@ describe('init', () => {
       expect(window.onColumnSelectedSetHighlightFactory)
         .toHaveBeenNthCalledWith(
           index + 1,
-          index % window.NUM_COLS,
+          index % initialState.board[0].length,
           slot,
           expect.objectContaining({
             highlighted: expect.any(String),
@@ -109,7 +113,7 @@ describe('init', () => {
           window.onNewStateSelectColumnFactory.mock.results[index].value,
         );
       expect(window.onNewStateSelectColumnFactory)
-        .toHaveBeenNthCalledWith(index + 1, slot, index % window.NUM_COLS);
+        .toHaveBeenNthCalledWith(index + 1, slot, index % initialState.board[0].length);
     });
 
     expect(resetButton.addEventListener).toBeCalledTimes(1);
@@ -120,7 +124,7 @@ describe('init', () => {
     expect(document.dispatchEvent).toBeCalledTimes(1);
     expect(document.dispatchEvent).toBeCalledWith(expect.any(CustomEvent));
     expect(document.dispatchEvent.mock.calls[0][0].type).toBe('newstate');
-    expect(document.dispatchEvent.mock.calls[0][0].detail).toEqual({ state: window.INITIAL_STATE });
+    expect(document.dispatchEvent.mock.calls[0][0].detail).toEqual({ state: initialState });
 
     expect(dropButton.addEventListener).toBeCalledTimes(0);
   });

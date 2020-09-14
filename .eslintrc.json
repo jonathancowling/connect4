@@ -19,7 +19,10 @@
             },
             "plugins": [
                 "jest"
-            ]
+            ],
+            "globals": {
+                "fetchMock": "readonly"
+            }
         },
         {
             "files": ["./static/init.js"],
@@ -35,11 +38,24 @@
                 "onNewStateMaybeEmitGameOver": "readonly",
                 "onGameOverShowWinnerFactory": "readonly",
                 "onColumnSelectedTakeTurnFactory": "readonly",
-                "takeTurnFactory": "readonly",
-                "checkWin": "readonly",
-                "INITIAL_STATE": "readonly",
-                "NUM_ROWS": "readonly",
-                "NUM_COLS": "readonly"
+                "takeTurn": "readonly",
+                "getInitialState": "readonly"
+            }
+        },
+        {
+            "files": ["./jest-setup/fetch.js"],
+            "globals": {
+                "fetchMock": "readonly"
+            },
+            "rules": {
+                "import/no-extraneous-dependencies": [
+                    "error",
+                    {
+                        "devDependencies": true,
+                        "optionalDependencies": false,
+                        "peerDependencies": false
+                    }
+                ]
             }
         }
     ]

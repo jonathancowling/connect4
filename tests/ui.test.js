@@ -5,11 +5,13 @@ const {
   onNewStateResetSelectedColumnFactory,
   onNewStateMaybeEmitGameOver,
   initCoin,
-  placeCoin,
+  setSlot,
   onColumnSelectedSetHighlightFactory,
   onColumnSelectedTakeTurnFactory,
   getColor,
   onGameOverShowWinnerFactory,
+  takeTurn,
+  getInitialState,
 } = require('../static/ui');
 
 document.dispatchEvent = jest.fn();
@@ -81,7 +83,7 @@ describe('placeCoin', () => {
     [coins[4], 3, [[coins[0], 1], [coins[1], 1], [coins[2], 1], [coins[4], 0], [null, 0]]],
     [coins[5], 1, [[coins[0], 1], [coins[5], 1], [coins[2], 1], [coins[4], 0], [null, 0]]],
   ])('%#. places coins in the correct cells', (coin, index, expected) => {
-    placeCoin(coin, index);
+    setSlot(coin, index);
 
     expect(slots[0].childElementCount).toBe(expected[0][1]);
     expect(slots[1].childElementCount).toBe(expected[1][1]);
@@ -471,6 +473,11 @@ describe('on game over', () => {
 });
 
 describe('on column selected', () => {
+  beforeEach(() => {
+    fetch.resetMocks();
+    fetchMock.doMock();
+  });
+
   test('columns colors are set correctly', () => {
     const target = {
       style: {
@@ -505,14 +512,14 @@ describe('on column selected', () => {
       removeEventListener: jest.fn(),
     };
     const expectedNewState = {};
-    const takeTurn = jest.fn().mockReturnValue(expectedNewState);
+    const mockTakeTurn = jest.fn().mockReturnValue(expectedNewState);
 
     const state = {};
     const index = 0;
     const event1 = new CustomEvent('columnselected', { detail: { index, state } });
     const event2 = new CustomEvent('columnselected', { detail: { index, state } });
 
-    const onColumnSelectedTakeTurn = onColumnSelectedTakeTurnFactory(target, takeTurn);
+    const onColumnSelectedTakeTurn = onColumnSelectedTakeTurnFactory(target, mockTakeTurn);
 
     onColumnSelectedTakeTurn(event1);
     onColumnSelectedTakeTurn(event2);
@@ -532,17 +539,8 @@ describe('on column selected', () => {
     const secondClickListener = target.addEventListener.mock.calls[1][1];
     secondClickListener();
 
-    expect(takeTurn.mock.calls).toEqual([
-      [state, index],
-    ]);
-
-    expect(document.dispatchEvent.mock.calls[0].length).toBe(1);
-
-    expect(document.dispatchEvent.mock.calls).toEqual([
-      [expect.any(CustomEvent)],
-    ]);
-    expect(document.dispatchEvent.mock.calls[0][0].type).toBe('newstate');
-    expect(document.dispatchEvent.mock.calls[0][0].detail).toEqual({ state: event2.detail.state });
+    expect(mockTakeTurn).toHaveBeenCalledTimes(1);
+    expect(mockTakeTurn).toHaveBeenCalledWith(state, index);
   });
 
   test('when no column is selected the drop button removes takeTurn on click', () => {
@@ -551,13 +549,13 @@ describe('on column selected', () => {
       removeEventListener: jest.fn(),
     };
     const expectedNewState = {};
-    const takeTurn = jest.fn().mockReturnValue(expectedNewState);
+    const mockTakeTurn = jest.fn().mockReturnValue(expectedNewState);
 
     const state = {};
     const index = null;
     const event1 = new CustomEvent('columnselected', { detail: { index, state } });
 
-    const onColumnSelectedTakeTurn = onColumnSelectedTakeTurnFactory(target, takeTurn);
+    const onColumnSelectedTakeTurn = onColumnSelectedTakeTurnFactory(target, mockTakeTurn);
 
     onColumnSelectedTakeTurn(event1);
 
@@ -573,7 +571,52 @@ describe('on column selected', () => {
 
     firstClickListener();
 
-    expect(takeTurn).not.toBeCalled();
+    expect(mockTakeTurn).not.toBeCalled();
+  });
+});
+
+describe('take turn', () => {
+  beforeEach(() => {
+    fetch.resetMocks();
+    fetchMock.doMock();
+  });
+
+  it('calls fetch and dispatches a new state event', async () => {
+    const state = 'this is some state';
+    fetch.mockResponseOnce(JSON.stringify({ state }));
+
+    await takeTurn(state, 0);
+    expect(fetch.mock.calls).toEqual([
+      ['/api/game/move', {
+        body: JSON.stringify({ col: 0 }),
+        method: 'POST',
+      }],
+    ]);
+
+    expect(document.dispatchEvent).toHaveBeenCalledTimes(1);
+    expect(document.dispatchEvent).toHaveBeenCalledWith(expect.any(CustomEvent));
+    expect(document.dispatchEvent.mock.calls[0][0].type).toBe('newstate');
+    expect(document.dispatchEvent.mock.calls[0][0].detail.state).toBe(state);
+  });
+});
+
+describe('get initial state', () => {
+  beforeEach(() => {
+    fetch.resetMocks();
+    fetchMock.doMock();
+  });
+
+  it('calls fetch and dispatches a new state event', async () => {
+    const expectedInitialState = 'this is some state';
+    fetch.mockResponseOnce(JSON.stringify({ state: expectedInitialState }));
+
+    const actualInitialState = await getInitialState(expectedInitialState, 0);
+    expect(fetch.mock.calls).toEqual([
+      ['/api/game/', {
+        method: 'POST',
+      }],
+    ]);
+    expect(actualInitialState).toBe(expectedInitialState);
   });
 });
 

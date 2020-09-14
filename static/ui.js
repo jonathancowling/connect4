@@ -115,23 +115,48 @@ function onColumnSelectedSetHighlightFactory(
   };
 }
 
-function onColumnSelectedTakeTurnFactory(target, takeTurn) {
+function onColumnSelectedTakeTurnFactory(target, takeTurnFn) {
   let currentClickListener;
 
   return (/** @type {CustomEvent} */ columnselectedEvent) => {
     target.removeEventListener('click', currentClickListener);
     currentClickListener = () => {
       if (columnselectedEvent.detail.index !== null) {
-        // TODO: change this to call api
-        document.dispatchEvent(new CustomEvent('newstate', {
-          detail: {
-            state: takeTurn(columnselectedEvent.detail.state, columnselectedEvent.detail.index),
-          },
-        }));
+        takeTurnFn(columnselectedEvent.detail.state, columnselectedEvent.detail.index);
       }
     };
     target.addEventListener('click', currentClickListener);
   };
+}
+
+async function getInitialState() {
+  const res = await fetch('/api/game/', {
+    method: 'POST',
+  });
+  // TODO
+  // if (!res.ok) {
+  //   throw new Error({ response: res });
+  // }
+  return (await res.json()).state;
+}
+
+async function takeTurn(_state, col) {
+  const res = await fetch('/api/game/move', {
+    method: 'POST',
+    body: JSON.stringify({ col }),
+  });
+
+  // TODO
+  // if (!res.ok) {
+  //   throw new Error({ response: res });
+  // }
+
+  const { state: newState } = await res.json();
+  document.dispatchEvent(new CustomEvent('newstate', {
+    detail: {
+      state: newState,
+    },
+  }));
 }
 
 function onNewStateMaybeEmitGameOver(event) {
@@ -167,9 +192,11 @@ module.exports = {
   onNewStateResetSelectedColumnFactory,
   onNewStateMaybeEmitGameOver,
   initCoin,
-  placeCoin: setSlot,
+  setSlot,
   getColor,
   onColumnSelectedSetHighlightFactory,
   onColumnSelectedTakeTurnFactory,
   onGameOverShowWinnerFactory,
+  takeTurn,
+  getInitialState,
 };
