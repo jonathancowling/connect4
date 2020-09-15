@@ -617,7 +617,7 @@ describe('get initial state', () => {
     const actualInitialState = await getInitialState();
     expect(fetch.mock.calls).toEqual([
       ['/api/game/', {
-        method: 'POST',
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },

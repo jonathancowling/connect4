@@ -131,7 +131,7 @@ function onColumnSelectedTakeTurnFactory(target, takeTurnFn) {
 
 async function getInitialState() {
   const res = await fetch('/api/game/', {
-    method: 'POST',
+    method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
@@ -189,20 +189,20 @@ function onGameOverShowWinnerFactory(getWinnerName) {
 }
 
 /* istanbul ignore next */
-// eslint-disable-next-line no-global-assign
-module = module || {};
-module.exports = {
-  initBoard,
-  onNewStatePlaceCoinFactory,
-  onNewStateSelectColumnFactory,
-  onNewStateResetSelectedColumnFactory,
-  onNewStateMaybeEmitGameOver,
-  initCoin,
-  setSlot,
-  getColor,
-  onColumnSelectedSetHighlightFactory,
-  onColumnSelectedTakeTurnFactory,
-  onGameOverShowWinnerFactory,
-  takeTurn,
-  getInitialState,
-};
+if (module) {
+  module.exports = {
+    initBoard,
+    onNewStatePlaceCoinFactory,
+    onNewStateSelectColumnFactory,
+    onNewStateResetSelectedColumnFactory,
+    onNewStateMaybeEmitGameOver,
+    initCoin,
+    setSlot,
+    getColor,
+    onColumnSelectedSetHighlightFactory,
+    onColumnSelectedTakeTurnFactory,
+    onGameOverShowWinnerFactory,
+    takeTurn,
+    getInitialState,
+  };
+}
