@@ -2,6 +2,7 @@ document.querySelector('#new-game').addEventListener('click', async () => {
   await fetch('/api/game/', {
     method: 'POST',
   });
+  // TODO
   // if (!res.ok) {
   //   throw new Error(res);
   // }
