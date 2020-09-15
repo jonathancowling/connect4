@@ -1,5 +1,5 @@
 /* eslint-disable global-require */
-describe('init', () => {
+describe('game', () => {
   let resetButton;
   let dropButton;
   const slots = [];
@@ -54,7 +54,7 @@ describe('init', () => {
   });
 
   test('', async () => {
-    require('../static/init.js');
+    require('../static/game.js');
 
     // wait for pending promises by scheduling this after init promises
     await new Promise((resolve) => resolve());

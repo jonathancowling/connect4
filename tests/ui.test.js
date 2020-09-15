@@ -583,13 +583,17 @@ describe('take turn', () => {
 
   it('calls fetch and dispatches a new state event', async () => {
     const state = 'this is some state';
+    const expectedCol = 0;
     fetch.mockResponseOnce(JSON.stringify({ state }));
 
-    await takeTurn(state, 0);
+    await takeTurn(state, expectedCol);
     expect(fetch.mock.calls).toEqual([
       ['/api/game/move', {
-        body: JSON.stringify({ col: 0 }),
+        body: JSON.stringify({ col: expectedCol }),
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }],
     ]);
 
@@ -610,10 +614,13 @@ describe('get initial state', () => {
     const expectedInitialState = 'this is some state';
     fetch.mockResponseOnce(JSON.stringify({ state: expectedInitialState }));
 
-    const actualInitialState = await getInitialState(expectedInitialState, 0);
+    const actualInitialState = await getInitialState();
     expect(fetch.mock.calls).toEqual([
       ['/api/game/', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }],
     ]);
     expect(actualInitialState).toBe(expectedInitialState);

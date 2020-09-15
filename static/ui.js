@@ -132,6 +132,9 @@ function onColumnSelectedTakeTurnFactory(target, takeTurnFn) {
 async function getInitialState() {
   const res = await fetch('/api/game/', {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
   // TODO
   // if (!res.ok) {
@@ -144,6 +147,9 @@ async function takeTurn(_state, col) {
   const res = await fetch('/api/game/move', {
     method: 'POST',
     body: JSON.stringify({ col }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
 
   // TODO

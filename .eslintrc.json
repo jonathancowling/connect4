@@ -25,7 +25,7 @@
             }
         },
         {
-            "files": ["./static/init.js"],
+            "files": ["./static/game.js"],
             "globals": {
                 "initBoard": "readonly",
                 "onNewStatePlaceCoinFactory": "readonly",
