@@ -2,6 +2,9 @@ process.env.NUM_ROWS = 2;
 process.env.NUM_COLS = 2;
 process.env.SESSION_SECRET = 'test';
 
+// stop morgan logging to the console
+jest.mock('morgan', () => (() => ((_req, _res, next) => { next(); })));
+
 const request = require('supertest');
 const { app } = require('../server');
 

@@ -19,6 +19,10 @@ test('calls app.listen', () => {
   // eslint-disable-next-line global-require
   require('../main.js');
 
+  // don't log listening message
+  const mockConsole = jest.spyOn(global.console, global.console.log.name);
+  mockConsole.mockImplementation(() => {});
+
   expect(mockConfig).toHaveBeenCalledTimes(1);
   expect(mockListen).toBeCalledTimes(1);
   expect(mockListen).toBeCalledWith(port, expect.any(Function));
