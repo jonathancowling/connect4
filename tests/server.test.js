@@ -154,4 +154,21 @@ describe('server', () => {
       .send({ col: 3 })
       .expect(400);
   });
+
+  it('returns 400 on POST /api/game/move for a missing column', async () => {
+    const agent = request(app);
+    let cookie;
+
+    await agent
+      .post('/api/game')
+      .expect(200)
+      .expect((res) => {
+        [cookie] = res.headers['set-cookie'];
+      });
+
+    await agent
+      .post('/api/game/move')
+      .set('cookie', cookie)
+      .expect(400);
+  });
 });
