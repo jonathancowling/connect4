@@ -1,17 +1,28 @@
-const NUM_ROWS = 8;
-const NUM_COLS = 8;
+/* eslint-disable max-classes-per-file */
 
-const INITIAL_STATE = {
-  board: Array(NUM_ROWS).fill(undefined).map(() => new Array(NUM_COLS).fill(null)),
-  winner: null,
-  player: 0,
-  moves: [],
+class ApiError extends Error {
+  constructor(source) {
+    super();
+    this.source = source;
+  }
+}
+
+class NetworkError extends Error {
+  constructor(source) {
+    super();
+    this.source = source;
+  }
+}
+
+const ErrorSource = {
+  NEW_GAME: Symbol('NEW_GAME'),
 };
 
+/* istanbul ignore next */
 if (module) {
   module.exports = {
-    INITIAL_STATE,
-    NUM_COLS,
-    NUM_ROWS,
+    ApiError,
+    NetworkError,
+    ErrorSource,
   };
 }

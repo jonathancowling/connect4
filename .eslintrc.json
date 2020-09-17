@@ -22,6 +22,14 @@
             }
         },
         {
+            "files": ["./static/index.js"],
+            "globals": {
+                "ApiError": "readonly",
+                "NetworkError": "readonly",
+                "ErrorSource": "readonly"
+            }
+        },
+        {
             "files": ["./static/game.js"],
             "globals": {
                 "initBoard": "readonly",
