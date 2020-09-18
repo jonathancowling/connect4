@@ -96,12 +96,18 @@ describe('initBoard', () => {
       player: 0,
     }, 1, 1],
     [{
-      board: [[null], [null]],
+      board: [
+        [null],
+        [null],
+      ],
       winner: null,
       player: 0,
     }, 2, 1],
     [{
-      board: [[null, null], [null, null]],
+      board: [
+        [null, null],
+        [null, null],
+      ],
       winner: null,
       player: 0,
     }, 2, 2],

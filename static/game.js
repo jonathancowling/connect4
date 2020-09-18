@@ -11,10 +11,10 @@ document.addEventListener(
 getInitialState().then((initialState) => {
   initBoard(initialState.board);
 
-  // FIXME
-  document.querySelector('#reset-button').addEventListener('click', () => {
+  document.querySelector('#reset-button').addEventListener('click', async () => {
+    const { state: newState } = await resetGame();
     document.dispatchEvent(new CustomEvent('newstate', {
-      detail: { state: initialState },
+      detail: { state: newState },
     }));
   });
 
