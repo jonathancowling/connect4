@@ -22,11 +22,18 @@
             }
         },
         {
+            "files": ["./static/ui.js"],
+            "globals": {
+                "ErrorType": "readonly",
+                "ErrorSource": "readonly"
+            }
+        },
+        {
             "files": ["./static/index.js"],
             "globals": {
-                "ApiError": "readonly",
-                "NetworkError": "readonly",
-                "ErrorSource": "readonly"
+                "ErrorType": "readonly",
+                "ErrorSource": "readonly",
+                "onGameErrorShowNotification": "readonly"
             }
         },
         {
@@ -42,6 +49,7 @@
                 "onNewStateResetSelectedColumnFactory": "readonly",
                 "onNewStateMaybeEmitGameOver": "readonly",
                 "onGameOverShowWinnerFactory": "readonly",
+                "onGameErrorShowNotification": "readonly",
                 "onColumnSelectedTakeTurnFactory": "readonly",
                 "takeTurn": "readonly",
                 "getInitialState": "readonly"

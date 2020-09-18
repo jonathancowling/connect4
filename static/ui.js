@@ -130,32 +130,74 @@ function onColumnSelectedTakeTurnFactory(target, takeTurnFn) {
 }
 
 async function getInitialState() {
-  const res = await fetch('/api/game/', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  // TODO
-  // if (!res.ok) {
-  //   throw new Error({ response: res });
-  // }
+  let res;
+  try {
+    res = await fetch('/api/game/', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch {
+    document.dispatchEvent(new CustomEvent('gameerror', {
+      detail: {
+        type: ErrorType.NETWORK_ERROR,
+        source: ErrorSource.INIT_GAME,
+      },
+    }));
+    throw new Error();
+  }
+
+  if (!res.ok) {
+    document.dispatchEvent(new CustomEvent('gameerror', {
+      detail: {
+        type: ErrorType.API_ERROR,
+        source: ErrorSource.INIT_GAME,
+      },
+    }));
+    throw new Error();
+  }
+
+  // const { state: newState } = ;
+  // document.dispatchEvent(new CustomEvent('newstate', {
+  //   detail: {
+  //     state: newState,
+  //   },
+  // }));
+
+  // FIXME
   return (await res.json()).state;
 }
 
 async function takeTurn(_state, col) {
-  const res = await fetch('/api/game/move', {
-    method: 'POST',
-    body: JSON.stringify({ col }),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  let res;
+  try {
+    res = await fetch('/api/game/move', {
+      method: 'POST',
+      body: JSON.stringify({ col }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch {
+    document.dispatchEvent(new CustomEvent('gameerror', {
+      detail: {
+        type: ErrorType.NETWORK_ERROR,
+        source: ErrorSource.TAKE_TURN,
+      },
+    }));
+    return;
+  }
 
-  // TODO
-  // if (!res.ok) {
-  //   throw new Error({ response: res });
-  // }
+  if (!res.ok) {
+    document.dispatchEvent(new CustomEvent('gameerror', {
+      detail: {
+        type: ErrorType.API_ERROR,
+        source: ErrorSource.TAKE_TURN,
+      },
+    }));
+    return;
+  }
 
   const { state: newState } = await res.json();
   document.dispatchEvent(new CustomEvent('newstate', {
@@ -188,6 +230,16 @@ function onGameOverShowWinnerFactory(getWinnerName) {
   };
 }
 
+function onGameErrorShowNotification() {
+  const notification = document.createElement('p');
+  notification.innerHTML = 'Oops! Something went wrong, please try again later';
+  const notificationPanel = document.querySelector('#notification-panel');
+  notificationPanel.appendChild(notification);
+  setTimeout(() => {
+    notificationPanel.removeChild(notification);
+  }, 3000);
+}
+
 /* istanbul ignore next */
 if (module) {
   module.exports = {
@@ -202,6 +254,7 @@ if (module) {
     onColumnSelectedSetHighlightFactory,
     onColumnSelectedTakeTurnFactory,
     onGameOverShowWinnerFactory,
+    onGameErrorShowNotification,
     takeTurn,
     getInitialState,
   };

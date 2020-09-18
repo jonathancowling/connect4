@@ -5,24 +5,20 @@ document.querySelector('#new-game').addEventListener('click', async () => {
     });
 
     if (!res.ok) {
-      throw new ApiError();
-    }
-
-    window.location.href = './game.html';
-  } catch (error) {
-    if (!(error instanceof ApiError)) {
       document.dispatchEvent(new CustomEvent('gameerror', {
         detail: {
-          error: new NetworkError(),
+          type: ErrorType.API_ERROR,
           source: ErrorSource.NEW_GAME,
         },
       }));
       return;
     }
 
+    window.location.href = './game.html';
+  } catch (error) {
     document.dispatchEvent(new CustomEvent('gameerror', {
       detail: {
-        error,
+        type: ErrorType.NETWORK_ERROR,
         source: ErrorSource.NEW_GAME,
       },
     }));
@@ -33,4 +29,4 @@ document.querySelector('#continue-game').addEventListener('click', () => {
   window.location.href = './game.html';
 });
 
-// TODO: listen for gameerror
+document.addEventListener('gameerror', onGameErrorShowNotification);

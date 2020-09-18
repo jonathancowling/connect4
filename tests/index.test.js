@@ -1,18 +1,17 @@
-const { ApiError, NetworkError } = require('../static/constants.js');
-
-document.dispatchEvent = jest.fn();
-beforeEach(() => {
-  document.dispatchEvent.mockReset();
-});
-
 describe('index', () => {
   let newGame;
   let continueGame;
-  beforeAll(() => {
+
+  beforeEach(() => {
+    document.dispatchEvent = jest.fn();
+    document.addEventListener = jest.fn();
+
     Object.defineProperty(window, 'location', {
       writable: true,
       value: {},
     });
+
+    document.body.innerHTML = '';
 
     newGame = document.createElement('button');
     newGame.id = 'new-game';
@@ -26,25 +25,33 @@ describe('index', () => {
       NEW_GAME: Symbol('NEW_GAME'),
     };
 
-    window.ApiError = ApiError;
-    window.NetworkError = NetworkError;
+    window.ErrorType = {
+      API_ERROR: Symbol('API_ERROR'),
+      NETWORK_ERROR: Symbol('NETWORK_ERROR'),
+    };
 
-    // eslint-disable-next-line global-require
-    require('../static/index');
-  });
+    window.onGameErrorShowNotification = jest.fn(() => ({}));
 
-  beforeEach(() => {
+    jest.resetModules();
     fetch.mockReset();
     fetch.doMock();
+    document.dispatchEvent.mockReset();
+    document.addEventListener.mockReset();
   });
 
   test('continue game should navigate to game', () => {
+    // eslint-disable-next-line global-require
+    require('../static/index');
+
     window.location.href = '/index.html';
     continueGame.click();
     expect(window.location.href).toBe('./game.html');
   });
 
   test('new game should fetch a new game navigate to game', async () => {
+    // eslint-disable-next-line global-require
+    require('../static/index');
+
     window.location.href = '/index.html';
     fetch.mockResponse({
       status: 200,
@@ -62,6 +69,9 @@ describe('index', () => {
   });
 
   test('new game should dispatch a gameerror when fetch returns a http error', async () => {
+    // eslint-disable-next-line global-require
+    require('../static/index');
+
     window.location.href = '/index.html';
 
     fetch.mockResponse(null, { status: 400 });
@@ -79,13 +89,16 @@ describe('index', () => {
     expect(document.dispatchEvent).toBeCalledTimes(1);
     expect(document.dispatchEvent.mock.calls[0][0].type).toBe('gameerror');
     expect(document.dispatchEvent.mock.calls[0][0].detail).toEqual({
-      error: expect.any(ApiError),
+      type: window.ErrorType.API_ERROR,
       source: window.ErrorSource.NEW_GAME,
     });
     expect(window.location.href).toBe('/index.html');
   });
 
   test('new game should dispatch a gameerror when fetch throws a network error', async () => {
+    // eslint-disable-next-line global-require
+    require('../static/index');
+
     window.location.href = '/index.html';
     fetch.mockReject(new Error());
     newGame.click();
@@ -101,9 +114,18 @@ describe('index', () => {
     expect(document.dispatchEvent).toBeCalledWith(expect.any(CustomEvent));
     expect(document.dispatchEvent.mock.calls[0][0].type).toBe('gameerror');
     expect(document.dispatchEvent.mock.calls[0][0].detail).toEqual({
-      error: expect.any(NetworkError),
+      type: window.ErrorType.NETWORK_ERROR,
       source: window.ErrorSource.NEW_GAME,
     });
     expect(window.location.href).toBe('/index.html');
+  });
+
+  test('game error listener is set', () => {
+    // eslint-disable-next-line global-require
+    require('../static/index');
+
+    expect(document.addEventListener).toBeCalledTimes(1);
+    expect(document.addEventListener)
+      .toBeCalledWith('gameerror', window.onGameErrorShowNotification);
   });
 });

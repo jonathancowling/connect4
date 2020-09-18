@@ -22,6 +22,7 @@ describe('game', () => {
     window.onNewStateMaybeEmitGameOver = jest.fn(() => ({}));
     window.onNewStateSelectColumnFactory = jest.fn(() => ({}));
     window.onGameOverShowWinnerFactory = jest.fn(() => ({}));
+    window.onGameErrorShowNotification = jest.fn(() => ({}));
     window.onColumnSelectedTakeTurnFactory = jest.fn(() => ({}));
     window.takeTurn = jest.fn(() => ({}));
     window.getInitialState = jest.fn(async () => initialState);
@@ -53,7 +54,7 @@ describe('game', () => {
     document.addEventListener = jest.fn();
   });
 
-  test('', async () => {
+  test('is initialised correctly', async () => {
     require('../static/game.js');
 
     // wait for pending promises by scheduling this after init promises
@@ -61,7 +62,7 @@ describe('game', () => {
 
     expect(window.getInitialState).toHaveBeenCalledTimes(1);
     expect(window.initBoard.mock.calls).toEqual([[initialState.board]]);
-    expect(document.addEventListener).toBeCalledTimes(5 + 2 * slots.length);
+    expect(document.addEventListener).toBeCalledTimes(6 + 2 * slots.length);
     expect(document.addEventListener)
       .toBeCalledWith('newstate', window.onNewStatePlaceCoinFactory.mock.results[0].value);
     expect(document.addEventListener)
@@ -72,6 +73,8 @@ describe('game', () => {
       .toBeCalledWith('gameover', window.onGameOverShowWinnerFactory.mock.results[0].value);
     expect(document.addEventListener)
       .toBeCalledWith('columnselected', window.onColumnSelectedTakeTurnFactory.mock.results[0].value);
+    expect(document.addEventListener)
+      .toBeCalledWith('gameerror', window.onGameErrorShowNotification);
     expect(document.dispatchEvent).toBeCalledTimes(1);
     expect(document.dispatchEvent).toBeCalledWith(expect.any(CustomEvent));
     expect(document.dispatchEvent.mock.calls[0][0].type).toBe('newstate');
@@ -121,6 +124,7 @@ describe('game', () => {
 
     document.dispatchEvent.mockClear();
     resetButton.addEventListener.mock.calls[0][1]();
+
     expect(document.dispatchEvent).toBeCalledTimes(1);
     expect(document.dispatchEvent).toBeCalledWith(expect.any(CustomEvent));
     expect(document.dispatchEvent.mock.calls[0][0].type).toBe('newstate');

@@ -2,6 +2,7 @@ document.addEventListener('newstate', onNewStatePlaceCoinFactory(initCoin, setSl
 document.addEventListener('newstate', onNewStateResetSelectedColumnFactory());
 document.addEventListener('newstate', onNewStateMaybeEmitGameOver);
 document.addEventListener('gameover', onGameOverShowWinnerFactory(getColor));
+document.addEventListener('gameerror', onGameErrorShowNotification);
 document.addEventListener(
   'columnselected',
   onColumnSelectedTakeTurnFactory(document.querySelector('#drop-button'), takeTurn),
@@ -10,6 +11,7 @@ document.addEventListener(
 getInitialState().then((initialState) => {
   initBoard(initialState.board);
 
+  // FIXME
   document.querySelector('#reset-button').addEventListener('click', () => {
     document.dispatchEvent(new CustomEvent('newstate', {
       detail: { state: initialState },
@@ -22,5 +24,6 @@ getInitialState().then((initialState) => {
     }));
     document.addEventListener('newstate', onNewStateSelectColumnFactory(element, index % initialState.board[0].length));
   });
+
   document.dispatchEvent(new CustomEvent('newstate', { detail: { state: initialState } }));
 });
