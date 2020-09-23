@@ -5,6 +5,9 @@ const {
 
 describe('on column selected', () => {
   beforeEach(() => {
+    jest.spyOn(document, 'dispatchEvent')
+      .mockImplementation()
+      .mockReset();
     fetch.resetMocks();
     fetchMock.doMock();
   });
@@ -37,13 +40,13 @@ describe('on column selected', () => {
     expect(target.style.backgroundColor).toBe(unhighlighted);
   });
 
-  test('when a column is selected the drop button takes a turn and replaces click listeners', () => {
+  test('the drop button replaces its click listener', () => {
     const target = {
       addEventListener: jest.fn(),
       removeEventListener: jest.fn(),
     };
     const expectedNewState = {};
-    const mockTakeTurn = jest.fn().mockReturnValue(expectedNewState);
+    const mockTakeTurn = jest.fn().mockResolvedValue(expectedNewState);
 
     const state = {};
     const index = 0;
@@ -66,15 +69,72 @@ describe('on column selected', () => {
       ['click', undefined],
       ['click', firstClickListener],
     ]);
+  });
 
-    const secondClickListener = target.addEventListener.mock.calls[1][1];
-    secondClickListener();
+  test('the drop buttons takeTurn is called on click and newstate event emitted on resolve', async () => {
+    const spy = jest.spyOn(document, 'dispatchEvent').mockImplementation();
+
+    const target = {
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    };
+    const expectedNewState = {};
+    const mockTakeTurn = jest.fn().mockResolvedValue(expectedNewState);
+
+    const state = {};
+    const index = 0;
+    const event1 = new CustomEvent('columnselected', { detail: { index, state } });
+
+    const onColumnSelectedTakeTurn = onColumnSelectedTakeTurnFactory(target, mockTakeTurn);
+
+    onColumnSelectedTakeTurn(event1);
+
+    const firstClickListener = target.addEventListener.mock.calls[0][1];
+
+    await firstClickListener();
 
     expect(mockTakeTurn).toHaveBeenCalledTimes(1);
     expect(mockTakeTurn).toHaveBeenCalledWith(state, index);
+
+    expect(spy).toBeCalledTimes(1);
+    expect(spy).toBeCalledWith(expect.any(CustomEvent));
+    expect(spy.mock.calls[0][0].type).toBe('newstate');
+    expect(spy.mock.calls[0][0].detail)
+      .toStrictEqual({ state: expectedNewState });
   });
 
-  test('when no column is selected the drop button removes takeTurn on click', () => {
+  test('the drop buttons takeTurn is called on click and gameerror event emitted on reject', async () => {
+    const spy = jest.spyOn(document, 'dispatchEvent').mockImplementation();
+    const target = {
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    };
+    const expectedDetail = {};
+    const mockTakeTurn = jest.fn().mockRejectedValue(expectedDetail);
+
+    const state = {};
+    const index = 0;
+    const event1 = new CustomEvent('columnselected', { detail: { index, state } });
+
+    const onColumnSelectedTakeTurn = onColumnSelectedTakeTurnFactory(target, mockTakeTurn);
+
+    onColumnSelectedTakeTurn(event1);
+
+    const firstClickListener = target.addEventListener.mock.calls[0][1];
+
+    await firstClickListener();
+
+    expect(mockTakeTurn).toHaveBeenCalledTimes(1);
+    expect(mockTakeTurn).toHaveBeenCalledWith(state, index);
+
+    expect(spy).toBeCalledTimes(1);
+    expect(spy).toBeCalledWith(expect.any(CustomEvent));
+    expect(spy.mock.calls[0][0].type).toBe('gameerror');
+    expect(spy.mock.calls[0][0].detail).toStrictEqual(expectedDetail);
+  });
+
+  test('when no column is selected the drop button removes takeTurn on click', async () => {
+    jest.spyOn(document, 'dispatchEvent').mockImplementation();
     const target = {
       addEventListener: jest.fn(),
       removeEventListener: jest.fn(),
@@ -100,7 +160,7 @@ describe('on column selected', () => {
       ['click', undefined],
     ]);
 
-    firstClickListener();
+    await firstClickListener();
 
     expect(mockTakeTurn).not.toBeCalled();
   });

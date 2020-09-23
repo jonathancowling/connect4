@@ -23,3 +23,11 @@ button {
 .round {
     border-radius: 50%;
 }
+
+table {
+    border-spacing: 0;
+}
+
+td {
+    padding: 0;
+}

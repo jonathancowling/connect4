@@ -120,92 +120,94 @@ function onColumnSelectedTakeTurnFactory(target, takeTurnFn) {
 
   return (/** @type {CustomEvent} */ columnselectedEvent) => {
     target.removeEventListener('click', currentClickListener);
-    currentClickListener = () => {
+    currentClickListener = async () => {
       if (columnselectedEvent.detail.index !== null) {
-        takeTurnFn(columnselectedEvent.detail.state, columnselectedEvent.detail.index);
+        try {
+          const newState = await takeTurnFn(
+            columnselectedEvent.detail.state,
+            columnselectedEvent.detail.index,
+          );
+          document.dispatchEvent(new CustomEvent('newstate', {
+            detail: {
+              state: newState,
+            },
+          }));
+        } catch (e) {
+          document.dispatchEvent(new CustomEvent('gameerror', {
+            detail: e,
+          }));
+        }
       }
     };
     target.addEventListener('click', currentClickListener);
   };
 }
 
-async function getInitialState() {
-  let res;
+async function getState() {
   try {
-    res = await fetch('/api/game/', {
+    const res = await fetch('/api/game/', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     });
+    if (!res.ok) {
+      return Promise.reject(new ApiError({
+        source: ErrorSource.INIT_GAME,
+      }));
+    }
+
+    return (await res.json()).state;
   } catch {
-    document.dispatchEvent(new CustomEvent('gameerror', {
-      detail: {
-        type: ErrorType.NETWORK_ERROR,
-        source: ErrorSource.INIT_GAME,
-      },
+    return Promise.reject(new NetworkError({
+      source: ErrorSource.INIT_GAME,
     }));
-    throw new Error();
   }
-
-  if (!res.ok) {
-    document.dispatchEvent(new CustomEvent('gameerror', {
-      detail: {
-        type: ErrorType.API_ERROR,
-        source: ErrorSource.INIT_GAME,
-      },
-    }));
-    throw new Error();
-  }
-
-  // const { state: newState } = ;
-  // document.dispatchEvent(new CustomEvent('newstate', {
-  //   detail: {
-  //     state: newState,
-  //   },
-  // }));
-
-  // FIXME
-  return (await res.json()).state;
 }
 
 async function takeTurn(_state, col) {
-  let res;
   try {
-    res = await fetch('/api/game/move', {
+    const res = await fetch('/api/game/move', {
       method: 'POST',
       body: JSON.stringify({ col }),
       headers: {
         'Content-Type': 'application/json',
       },
     });
+    if (!res.ok) {
+      return Promise.reject(new ApiError({
+        source: ErrorSource.TAKE_TURN,
+      }));
+    }
+
+    return (await res.json()).state;
   } catch {
-    document.dispatchEvent(new CustomEvent('gameerror', {
-      detail: {
-        type: ErrorType.NETWORK_ERROR,
-        source: ErrorSource.TAKE_TURN,
-      },
+    return Promise.reject(new NetworkError({
+      source: ErrorSource.TAKE_TURN,
     }));
-    return;
   }
+}
 
-  if (!res.ok) {
-    document.dispatchEvent(new CustomEvent('gameerror', {
-      detail: {
-        type: ErrorType.API_ERROR,
-        source: ErrorSource.TAKE_TURN,
+async function resetGame() {
+  try {
+    const res = await fetch('/api/game/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    }));
-    return;
-  }
+    });
+    if (!res.ok) {
+      return Promise.reject(new ApiError({
+        source: ErrorSource.RESET_GAME,
+      }));
+    }
 
-  // TODO: standardise all API stuff (perhaps a class for this)
-  const { state: newState } = await res.json();
-  document.dispatchEvent(new CustomEvent('newstate', {
-    detail: {
-      state: newState,
-    },
-  }));
+    return (await res.json()).state;
+  } catch {
+    return Promise.reject(new NetworkError({
+      source: ErrorSource.RESET_GAME,
+    }));
+  }
 }
 
 function onNewStateMaybeEmitGameOver(event) {
@@ -241,10 +243,6 @@ function onGameErrorShowNotification() {
   }, 3000);
 }
 
-function resetGame() {
-  return Promise.reject(new Error('not implemented'));
-}
-
 /* istanbul ignore next */
 if (module) {
   module.exports = {
@@ -261,7 +259,7 @@ if (module) {
     onGameOverShowWinnerFactory,
     onGameErrorShowNotification,
     takeTurn,
-    getInitialState,
+    getState,
     resetGame,
   };
 }
