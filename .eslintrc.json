@@ -24,7 +24,8 @@
         {
             "files": ["./static/ui.js"],
             "globals": {
-                "ErrorType": "readonly",
+                "ApiError": "readonly",
+                "NetworkError": "readonly",
                 "ErrorSource": "readonly"
             }
         },
@@ -52,7 +53,7 @@
                 "onGameErrorShowNotification": "readonly",
                 "onColumnSelectedTakeTurnFactory": "readonly",
                 "takeTurn": "readonly",
-                "getInitialState": "readonly",
+                "getState": "readonly",
                 "resetGame": "readonly"
             }
         },

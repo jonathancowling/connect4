@@ -1,3 +1,5 @@
+/* eslint-disable max-classes-per-file */
+
 window.ErrorSource = {
   TAKE_TURN: Symbol('TAKE_TURN'),
 };
@@ -11,11 +13,6 @@ const {
   takeTurn,
 } = require('../../static/ui');
 
-document.dispatchEvent = jest.fn();
-beforeEach(() => {
-  document.dispatchEvent.mockReset();
-});
-
 describe('take turn', () => {
   beforeEach(() => {
     fetch.resetMocks();
@@ -23,11 +20,11 @@ describe('take turn', () => {
   });
 
   it('calls fetch and dispatches a new state event', async () => {
-    const state = 'this is some state';
+    const expectedNewState = 'this is some state';
     const expectedCol = 0;
-    fetch.mockResponseOnce(JSON.stringify({ state }));
+    fetch.mockResponseOnce(JSON.stringify({ state: expectedNewState }));
 
-    await takeTurn(state, expectedCol);
+    const actualNewState = await takeTurn(expectedNewState, expectedCol);
     expect(fetch.mock.calls).toEqual([
       ['/api/game/move', {
         body: JSON.stringify({ col: expectedCol }),
@@ -38,19 +35,19 @@ describe('take turn', () => {
       }],
     ]);
 
-    expect(document.dispatchEvent).toHaveBeenCalledTimes(1);
-    expect(document.dispatchEvent).toHaveBeenCalledWith(expect.any(CustomEvent));
-    expect(document.dispatchEvent.mock.calls[0][0].type).toBe('newstate');
-    expect(document.dispatchEvent.mock.calls[0][0].detail.state).toBe(state);
+    expect(actualNewState).toBe(expectedNewState);
   });
 
-  test('dispatches a gameerror when fetch returns a http error', async () => {
+  test('rejects with an ApiError when fetch returns a http error', async () => {
     const state = 'this is some state';
     const expectedCol = 0;
 
     fetch.mockResponse(null, { status: 400 });
+    window.ApiError = jest.fn();
 
-    await takeTurn(state, expectedCol);
+    const expectReason = await expect(takeTurn(state, expectedCol)).rejects;
+    await expectReason.toBeInstanceOf(window.ApiError);
+    expect(window.ApiError).toBeCalledWith({ source: window.ErrorSource.TAKE_TURN });
 
     expect(fetch.mock.calls).toEqual([
       ['/api/game/move', {
@@ -61,23 +58,18 @@ describe('take turn', () => {
         },
       }],
     ]);
-
-    expect(document.dispatchEvent).toHaveBeenCalledTimes(1);
-    expect(document.dispatchEvent).toHaveBeenCalledWith(expect.any(CustomEvent));
-    expect(document.dispatchEvent.mock.calls[0][0].type).toBe('gameerror');
-    expect(document.dispatchEvent.mock.calls[0][0].detail.type)
-      .toBe(window.ErrorType.API_ERROR);
-    expect(document.dispatchEvent.mock.calls[0][0].detail.source)
-      .toBe(window.ErrorSource.TAKE_TURN);
   });
 
-  test('dispatches a gameerror when fetch throws a network error', async () => {
+  test('rejects when fetch throws a network error', async () => {
     const state = 'this is some state';
     const expectedCol = 0;
 
     fetch.mockReject(new Error());
+    window.NetworkError = jest.fn();
 
-    await takeTurn(state, expectedCol);
+    const expectReason = await expect(takeTurn(state, expectedCol)).rejects;
+    await expectReason.toBeInstanceOf(window.NetworkError);
+    expect(window.NetworkError).toBeCalledWith({ source: window.ErrorSource.TAKE_TURN });
 
     expect(fetch.mock.calls).toEqual([
       ['/api/game/move', {
@@ -88,13 +80,5 @@ describe('take turn', () => {
         },
       }],
     ]);
-
-    expect(document.dispatchEvent).toHaveBeenCalledTimes(1);
-    expect(document.dispatchEvent).toHaveBeenCalledWith(expect.any(CustomEvent));
-    expect(document.dispatchEvent.mock.calls[0][0].type).toBe('gameerror');
-    expect(document.dispatchEvent.mock.calls[0][0].detail.type)
-      .toBe(window.ErrorType.NETWORK_ERROR);
-    expect(document.dispatchEvent.mock.calls[0][0].detail.source)
-      .toBe(window.ErrorSource.TAKE_TURN);
   });
 });

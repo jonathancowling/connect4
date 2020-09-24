@@ -8,22 +8,28 @@ document.addEventListener(
   onColumnSelectedTakeTurnFactory(document.querySelector('#drop-button'), takeTurn),
 );
 
-getInitialState().then((initialState) => {
-  initBoard(initialState.board);
+getState().then((state) => {
+  initBoard(state.board);
 
   document.querySelector('#reset-button').addEventListener('click', async () => {
-    const { state: newState } = await resetGame();
-    document.dispatchEvent(new CustomEvent('newstate', {
-      detail: { state: newState },
-    }));
+    try {
+      const newState = await resetGame();
+      document.dispatchEvent(new CustomEvent('newstate', {
+        detail: { state: newState },
+      }));
+    } catch (e) {
+      document.dispatchEvent(new CustomEvent('gameerror', { detail: e.detail }));
+    }
   });
 
   Array.from(document.querySelectorAll('.slot')).forEach((element, index) => {
-    document.addEventListener('columnselected', onColumnSelectedSetHighlightFactory(index % initialState.board[0].length, element, {
+    document.addEventListener('columnselected', onColumnSelectedSetHighlightFactory(index % state.board[0].length, element, {
       highlighted: 'lightgrey', unhighlighted: 'white',
     }));
-    document.addEventListener('newstate', onNewStateSelectColumnFactory(element, index % initialState.board[0].length));
+    document.addEventListener('newstate', onNewStateSelectColumnFactory(element, index % state.board[0].length));
   });
 
-  document.dispatchEvent(new CustomEvent('newstate', { detail: { state: initialState } }));
+  document.dispatchEvent(new CustomEvent('newstate', { detail: { state } }));
+}).catch((e) => {
+  document.dispatchEvent(new CustomEvent('gameerror', { detail: e.detail }));
 });

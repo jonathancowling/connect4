@@ -1,3 +1,5 @@
+const { flushPromises } = require('./flush-promises');
+
 /* eslint-disable global-require */
 describe('game', () => {
   const initialState = {
@@ -9,6 +11,7 @@ describe('game', () => {
   };
 
   beforeEach(() => {
+    jest.resetAllMocks();
     jest.resetModules();
     document.body.innerHTML = '';
     document.head.innerHTML = '';
@@ -28,7 +31,7 @@ describe('game', () => {
     window.onGameErrorShowNotification = jest.fn(() => ({}));
     window.onColumnSelectedTakeTurnFactory = jest.fn(() => ({}));
     window.takeTurn = jest.fn(() => ({}));
-    window.getInitialState = jest.fn(async () => initialState);
+    window.getState = jest.fn(async () => initialState);
     window.checkWin = jest.fn(() => ({}));
     window.resetGame = jest.fn();
     document.dispatchEvent = jest.fn();
@@ -59,10 +62,9 @@ describe('game', () => {
 
     require('../static/game.js');
 
-    // wait for pending promises by scheduling this after init promises
-    await new Promise((resolve) => resolve());
+    await flushPromises();
 
-    expect(window.getInitialState).toHaveBeenCalledTimes(1);
+    expect(window.getState).toHaveBeenCalledTimes(1);
     expect(window.initBoard.mock.calls).toEqual([[initialState.board]]);
     expect(document.addEventListener).toBeCalledTimes(6 + 2 * slots.length);
     expect(document.addEventListener)
@@ -125,6 +127,69 @@ describe('game', () => {
     expect(resetButton.addEventListener).toBeCalledWith('click', expect.any(Function));
   });
 
+  test('handles initilisation error', async () => {
+    window.onNewStatePlaceCoinFactory = jest.fn(() => ({}));
+    window.onNewStateResetSelectedColumnFactory = jest.fn(() => ({}));
+    window.onColumnSelectedSetHighlightFactory = jest.fn(() => ({}));
+    window.onNewStateMaybeEmitGameOver = jest.fn(() => ({}));
+    window.onNewStateSelectColumnFactory = jest.fn(() => ({}));
+    window.onGameOverShowWinnerFactory = jest.fn(() => ({}));
+    window.onGameErrorShowNotification = jest.fn(() => ({}));
+    const errorDetails = {};
+    window.getState = jest.fn().mockRejectedValue({
+      detail: errorDetails,
+    });
+    const mockDispatchEvent = jest.spyOn(document, 'dispatchEvent');
+    const mockAddEventListener = jest.spyOn(document, 'addEventListener');
+
+    const board = document.createElement('div');
+    board.id = 'main-game';
+    document.body.appendChild(board);
+
+    const dropButton = document.createElement('button');
+    dropButton.id = 'drop-button';
+    dropButton.addEventListener = jest.fn();
+    document.body.appendChild(dropButton);
+
+    require('../static/game.js');
+
+    await flushPromises();
+
+    expect(window.getState).toHaveBeenCalledTimes(1);
+
+    expect(window.initBoard).not.toHaveBeenCalled();
+
+    expect(mockAddEventListener).toBeCalledTimes(6);
+    expect(mockAddEventListener)
+      .toBeCalledWith('newstate', window.onNewStatePlaceCoinFactory.mock.results[0].value);
+    expect(mockAddEventListener)
+      .toBeCalledWith('newstate', window.onNewStateResetSelectedColumnFactory.mock.results[0].value);
+    expect(mockAddEventListener)
+      .toBeCalledWith('newstate', window.onNewStateMaybeEmitGameOver);
+    expect(mockAddEventListener)
+      .toBeCalledWith('gameover', window.onGameOverShowWinnerFactory.mock.results[0].value);
+    expect(mockAddEventListener)
+      .toBeCalledWith('columnselected', window.onColumnSelectedTakeTurnFactory.mock.results[0].value);
+    expect(mockAddEventListener)
+      .toBeCalledWith('gameerror', window.onGameErrorShowNotification);
+
+    expect(window.onNewStatePlaceCoinFactory).toBeCalledTimes(1);
+    expect(window.onNewStatePlaceCoinFactory)
+      .toBeCalledWith(window.initCoin, window.setSlot, window.getColor);
+    expect(window.onNewStateResetSelectedColumnFactory).toBeCalledTimes(1);
+    expect(window.onNewStateResetSelectedColumnFactory).toBeCalledWith();
+    expect(window.onGameOverShowWinnerFactory).toBeCalledTimes(1);
+    expect(window.onGameOverShowWinnerFactory).toBeCalledWith(window.getColor);
+    expect(window.onColumnSelectedTakeTurnFactory).toBeCalledTimes(1);
+    expect(window.onColumnSelectedTakeTurnFactory)
+      .toBeCalledWith(dropButton, window.takeTurn);
+
+    expect(mockDispatchEvent).toBeCalledTimes(1);
+    expect(mockDispatchEvent).toBeCalledWith(expect.any(CustomEvent));
+    expect(mockDispatchEvent.mock.calls[0][0].type).toBe('gameerror');
+    expect(mockDispatchEvent.mock.calls[0][0].detail).toBe(errorDetails);
+  });
+
   test('resets the game when reset button is clicked and fetches successfully', async () => {
     window.initBoard = jest.fn(() => ({}));
     window.onNewStatePlaceCoinFactory = jest.fn(() => ({}));
@@ -139,7 +204,7 @@ describe('game', () => {
     window.onGameErrorShowNotification = jest.fn(() => ({}));
     window.onColumnSelectedTakeTurnFactory = jest.fn(() => ({}));
     window.takeTurn = jest.fn(() => ({}));
-    window.getInitialState = jest.fn(async () => initialState);
+    window.getState = jest.fn(async () => initialState);
     window.checkWin = jest.fn(() => ({}));
     window.resetGame = jest.fn();
     document.dispatchEvent = jest.fn();
@@ -170,13 +235,10 @@ describe('game', () => {
 
     require('../static/game.js');
 
-    // wait for pending promises by scheduling this after init promises
-    await new Promise((resolve) => resolve());
+    await flushPromises();
 
     const resetState = {};
-    window.resetGame.mockResolvedValue({
-      state: resetState,
-    });
+    window.resetGame.mockResolvedValue(resetState);
 
     document.dispatchEvent.mockClear();
     expect(resetButton.addEventListener).toBeCalledTimes(1);
@@ -206,9 +268,15 @@ describe('game', () => {
     window.onGameErrorShowNotification = jest.fn(() => ({}));
     window.onColumnSelectedTakeTurnFactory = jest.fn(() => ({}));
     window.takeTurn = jest.fn(() => ({}));
-    window.getInitialState = jest.fn(async () => initialState);
+    window.getState = jest.fn(async () => initialState);
     window.checkWin = jest.fn(() => ({}));
     window.resetGame = jest.fn();
+    window.ErrorType = {
+      API_ERROR: Symbol('API_ERROR'),
+    };
+    window.ErrorSource = {
+      RESET_GAME: Symbol('RESET_GAME'),
+    };
     document.dispatchEvent = jest.fn();
     document.addEventListener = jest.fn();
 
@@ -237,10 +305,10 @@ describe('game', () => {
 
     require('../static/game.js');
 
-    // wait for pending promises by scheduling this after init promises
-    await new Promise((resolve) => resolve());
+    await new Promise((resolve) => setImmediate(resolve));
 
-    window.resetGame.mockRejectedValue(new Error());
+    const expectedDetail = {};
+    window.resetGame.mockRejectedValue({ detail: expectedDetail });
 
     document.dispatchEvent.mockClear();
     expect(resetButton.addEventListener).toBeCalledTimes(1);
@@ -251,10 +319,8 @@ describe('game', () => {
     expect(document.dispatchEvent).toBeCalledTimes(1);
     expect(document.dispatchEvent).toBeCalledWith(expect.any(CustomEvent));
     expect(document.dispatchEvent.mock.calls[0][0].type).toBe('gameerror');
-    expect(document.dispatchEvent.mock.calls[0][0].detail).toStrictEqual({
-      type: null,
-      source: null,
-    });
+    expect(document.dispatchEvent.mock.calls[0][0].detail)
+      .toBe(expectedDetail);
 
     expect(dropButton.addEventListener).toBeCalledTimes(0);
   });
