@@ -199,6 +199,7 @@ async function takeTurn(_state, col) {
     return;
   }
 
+  // TODO: standardise all API stuff (perhaps a class for this)
   const { state: newState } = await res.json();
   document.dispatchEvent(new CustomEvent('newstate', {
     detail: {
@@ -240,6 +241,10 @@ function onGameErrorShowNotification() {
   }, 3000);
 }
 
+function resetGame() {
+  return Promise.reject(new Error('not implemented'));
+}
+
 /* istanbul ignore next */
 if (module) {
   module.exports = {
@@ -257,5 +262,6 @@ if (module) {
     onGameErrorShowNotification,
     takeTurn,
     getInitialState,
+    resetGame,
   };
 }

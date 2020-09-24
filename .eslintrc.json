@@ -52,7 +52,8 @@
                 "onGameErrorShowNotification": "readonly",
                 "onColumnSelectedTakeTurnFactory": "readonly",
                 "takeTurn": "readonly",
-                "getInitialState": "readonly"
+                "getInitialState": "readonly",
+                "resetGame": "readonly"
             }
         },
         {
