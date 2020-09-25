@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+  web:
+    restart: always
+    build: ..
+    ports:
+      - "3010:3000"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/connect4
+      - NUM_ROWS=${NUM_ROWS}
+      - NUM_COLS=${NUM_COLS}
+      - PORT=${PORT}
+      - SESSION_SECRET=${SESSION_SECRET}
+  mongo:
+    image: mongo:4.4.1
+    restart: always
+    ports:
+      - "27017:27017"
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME: root
+    #   MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+  # echo:
+  #   image: hashicorp/http-echo
+  #   ports:
+  #     - "3001:8080"
+  #   command:  -listen=:8080 -text="hello world"
+

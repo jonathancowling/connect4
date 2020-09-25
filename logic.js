@@ -42,7 +42,7 @@ function checkWin(state) {
   if (numRows === 0) {
     return {
       gameOver: true,
-      winner: undefined,
+      winner: null,
     };
   }
 
@@ -50,14 +50,14 @@ function checkWin(state) {
   if (numCols === 0) {
     return {
       gameOver: true,
-      winner: undefined,
+      winner: null,
     };
   }
 
   if (state.moves.length === 0) {
     return {
       gameOver: false,
-      winner: undefined,
+      winner: null,
     };
   }
 
@@ -158,7 +158,7 @@ function checkWin(state) {
 
   return {
     gameOver: boardIsFull,
-    winner: undefined,
+    winner: null,
   };
 }
 

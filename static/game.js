@@ -29,6 +29,13 @@ getState().then((state) => {
     document.addEventListener('newstate', onNewStateSelectColumnFactory(element, index % state.board[0].length));
   });
 
+  const sse = new EventSource('/api/game/subscribe');
+  sse.onmessage = (event) => {
+    document.dispatchEvent(new CustomEvent('newstate', {
+      detail: { state: JSON.parse(event.data).state },
+    }));
+  };
+
   document.dispatchEvent(new CustomEvent('newstate', { detail: { state } }));
 }).catch((e) => {
   document.dispatchEvent(new CustomEvent('gameerror', { detail: e.detail }));
