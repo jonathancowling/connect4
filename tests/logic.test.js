@@ -19,10 +19,10 @@ describe('takeTurn', () => {
         ],
         moves: [],
         gameOver: false,
-        winner: undefined,
+        winner: null,
         player: 0,
       },
-      jest.fn(() => ({ gameOver: false, winner: undefined })),
+      jest.fn(() => ({ gameOver: false, winner: null })),
       0,
       {
         board: [
@@ -31,7 +31,7 @@ describe('takeTurn', () => {
         ],
         moves: [[0, 1, 0]],
         gameOver: false,
-        winner: undefined,
+        winner: null,
         player: 1,
       },
     ],
@@ -43,10 +43,10 @@ describe('takeTurn', () => {
         ],
         moves: [[0, 1, 0]],
         gameOver: false,
-        winner: undefined,
+        winner: null,
         player: 0,
       },
-      jest.fn(() => ({ gameOver: false, winner: undefined })),
+      jest.fn(() => ({ gameOver: false, winner: null })),
       0,
       {
         board: [
@@ -55,7 +55,7 @@ describe('takeTurn', () => {
         ],
         moves: [[0, 1, 0], [0, 0, 0]],
         gameOver: false,
-        winner: undefined,
+        winner: null,
         player: 1,
       },
     ],
@@ -67,10 +67,10 @@ describe('takeTurn', () => {
         ],
         moves: [[0, 1, 0], [0, 0, 0]],
         gameOver: false,
-        winner: undefined,
+        winner: null,
         player: 0,
       },
-      jest.fn(() => ({ gameOver: false, winner: undefined })),
+      jest.fn(() => ({ gameOver: false, winner: null })),
       1,
       {
         board: [
@@ -78,7 +78,7 @@ describe('takeTurn', () => {
           [0, 0],
         ],
         gameOver: false,
-        winner: undefined,
+        winner: null,
         moves: [[0, 1, 0], [0, 0, 0], [0, 1, 1]],
         player: 1,
       },
@@ -91,10 +91,10 @@ describe('takeTurn', () => {
         ],
         moves: [[0, 1, 0], [0, 0, 0], [0, 1, 1]],
         gameOver: false,
-        winner: undefined,
+        winner: null,
         player: 0,
       },
-      jest.fn(() => ({ gameOver: false, winner: undefined })),
+      jest.fn(() => ({ gameOver: false, winner: null })),
       1,
       {
         board: [
@@ -103,7 +103,7 @@ describe('takeTurn', () => {
         ],
         moves: [[0, 1, 0], [0, 0, 0], [0, 1, 1], [0, 0, 1]],
         gameOver: false,
-        winner: undefined,
+        winner: null,
         player: 1,
       },
     ],
@@ -114,11 +114,11 @@ describe('takeTurn', () => {
           [0, null],
         ],
         gameOver: false,
-        winner: undefined,
+        winner: null,
         moves: [[0, 1, 0], [0, 0, 0]],
         player: 1,
       },
-      jest.fn(() => ({ gameOver: false, winner: undefined })),
+      jest.fn(() => ({ gameOver: false, winner: null })),
       1,
       {
         board: [
@@ -127,7 +127,7 @@ describe('takeTurn', () => {
         ],
         moves: [[0, 1, 0], [0, 0, 0], [1, 1, 1]],
         gameOver: false,
-        winner: undefined,
+        winner: null,
         player: 0,
       },
     ],
@@ -138,7 +138,7 @@ describe('takeTurn', () => {
           [0, null],
         ],
         gameOver: false,
-        winner: undefined,
+        winner: null,
         moves: [[0, 1, 0], [0, 0, 0]],
         player: 1,
       },
@@ -175,7 +175,7 @@ describe('takeTurn', () => {
         [0],
       ],
       gameOver: false,
-      winner: undefined,
+      winner: null,
       moves: [],
       player: 0,
     };
@@ -186,7 +186,7 @@ describe('takeTurn', () => {
       ],
       moves: [],
       gameOver: false,
-      winner: undefined,
+      winner: null,
       player: 0,
       error: ILLEGAL_MOVE_FULL_COLUMN,
     };
@@ -201,7 +201,7 @@ describe('takeTurn', () => {
       ],
       moves: [],
       gameOver: false,
-      winner: undefined,
+      winner: null,
       player: 0,
     };
 
@@ -210,13 +210,13 @@ describe('takeTurn', () => {
         [null],
       ],
       gameOver: false,
-      winner: undefined,
+      winner: null,
       player: 0,
       moves: [],
       error: ILLEGAL_MOVE_COLUMN_DOESNT_EXIST,
     };
 
-    const mockCheckWin = jest.fn(() => ({ gameOver: false, winner: undefined }));
+    const mockCheckWin = jest.fn(() => ({ gameOver: false, winner: null }));
 
     expect(takeTurnFactory(mockCheckWin)(initialState, 1)).toEqual(expectedState);
   });
@@ -229,7 +229,7 @@ describe('takeTurn', () => {
       ],
       moves: [],
       gameOver: false,
-      winner: undefined,
+      winner: null,
       player: 0,
       error: ILLEGAL_MOVE_FULL_COLUMN,
     };
@@ -241,11 +241,11 @@ describe('takeTurn', () => {
       ],
       moves: [[0, 1, 0]],
       gameOver: false,
-      winner: undefined,
+      winner: null,
       player: 1,
     };
 
-    const mockCheckWin = jest.fn(() => ({ gameOver: false, winner: undefined }));
+    const mockCheckWin = jest.fn(() => ({ gameOver: false, winner: null }));
 
     expect(takeTurnFactory(mockCheckWin)(initialState, 0)).toEqual(expectedState);
   });
@@ -256,28 +256,28 @@ test.each([
     { board: [], moves: [] },
     {
       gameOver: true,
-      winner: undefined,
+      winner: null,
     },
   ],
   [
     { board: [[]], moves: [] },
     {
       gameOver: true,
-      winner: undefined,
+      winner: null,
     },
   ],
   [
     { board: [[null]], moves: [] },
     {
       gameOver: false,
-      winner: undefined,
+      winner: null,
     },
   ],
   [
     { board: [[0]], moves: [[0, 0, 0]] },
     {
       gameOver: true,
-      winner: undefined,
+      winner: null,
     },
   ],
   [
@@ -293,7 +293,7 @@ test.each([
     },
     {
       gameOver: false,
-      winner: undefined,
+      winner: null,
     },
   ],
   [
@@ -310,7 +310,7 @@ test.each([
     },
     {
       gameOver: false,
-      winner: undefined,
+      winner: null,
     },
   ],
   [
@@ -378,7 +378,7 @@ test.each([
     },
     {
       gameOver: false,
-      winner: undefined,
+      winner: null,
     },
   ],
   [
@@ -429,7 +429,7 @@ test.each([
     },
     {
       gameOver: false,
-      winner: undefined,
+      winner: null,
     },
   ],
   [
@@ -481,7 +481,7 @@ test.each([
     },
     {
       gameOver: false,
-      winner: undefined,
+      winner: null,
     },
   ],
   [
@@ -557,7 +557,7 @@ test.each([
     },
     {
       gameOver: true,
-      winner: undefined,
+      winner: null,
     },
   ],
 
