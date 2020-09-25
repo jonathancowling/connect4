@@ -19,9 +19,3 @@ services:
     # environment:
     #   MONGO_INITDB_ROOT_USERNAME: root
     #   MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-  # echo:
-  #   image: hashicorp/http-echo
-  #   ports:
-  #     - "3001:8080"
-  #   command:  -listen=:8080 -text="hello world"
-
