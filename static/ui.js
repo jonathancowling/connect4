@@ -235,12 +235,14 @@ function onGameOverShowWinnerFactory(getWinnerName) {
 
 function onGameErrorShowNotification() {
   const notification = document.createElement('p');
-  notification.innerHTML = 'Oops! Something went wrong, please try again later';
+  notification.append(document.createTextNode('Oops! Something went wrong, click '));
+  const a = document.createElement('a');
+  a.setAttribute('href', '..');
+  a.textContent = 'here';
+  notification.appendChild(a);
+  notification.append(document.createTextNode(' to return to main menu.'));
   const notificationPanel = document.querySelector('#notification-panel');
   notificationPanel.appendChild(notification);
-  setTimeout(() => {
-    notificationPanel.removeChild(notification);
-  }, 3000);
 }
 
 /* istanbul ignore next */

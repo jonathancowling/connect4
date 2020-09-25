@@ -2,7 +2,6 @@ const { onGameErrorShowNotification } = require('../../static/ui.js');
 
 describe('on game error', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
     document.body.innerHTML = '';
   });
 
@@ -13,12 +12,20 @@ describe('on game error', () => {
 
     onGameErrorShowNotification(new CustomEvent('gameerror'));
 
-    expect(notificationPanel.childElementCount).toBe(1);
-    expect(notificationPanel.firstElementChild.innerHTML)
-      .toBe('Oops! Something went wrong, please try again later');
-
-    jest.advanceTimersByTime(3000);
-
-    expect(notificationPanel.hasChildNodes()).toBe(false);
+    expect(notificationPanel.childNodes.length).toBe(1);
+    const notification = notificationPanel.firstElementChild;
+    expect(notification.childNodes.length).toBe(3);
+    expect(
+      notification.childNodes[0].isEqualNode(
+        document.createTextNode('Oops! Something went wrong, click '),
+      ),
+    ).toBe(true);
+    expect(notification.childNodes[1].textContent).toBe('here');
+    expect(notification.childNodes[1].getAttribute('href')).toBe('..');
+    expect(
+      notification.childNodes[2].isEqualNode(
+        document.createTextNode(' to return to main menu.'),
+      ),
+    ).toBe(true);
   });
 });
