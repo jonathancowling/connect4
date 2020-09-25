@@ -1,6 +1,7 @@
 describe('index', () => {
   let newGame;
   let continueGame;
+  let joinForm;
 
   beforeEach(() => {
     document.dispatchEvent = jest.fn();
@@ -20,6 +21,13 @@ describe('index', () => {
     continueGame = document.createElement('button');
     continueGame.id = 'continue-game';
     document.body.appendChild(continueGame);
+
+    joinForm = document.createElement('form');
+    joinForm.id = 'join-form';
+    const joinFormCodeInput = document.createElement('input');
+    joinFormCodeInput.id = 'game-code-input';
+    joinForm.append(joinFormCodeInput);
+    document.body.appendChild(joinForm);
 
     window.ErrorSource = {
       NEW_GAME: Symbol('NEW_GAME'),

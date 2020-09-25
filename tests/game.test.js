@@ -34,6 +34,7 @@ describe('game', () => {
     window.getState = jest.fn(async () => initialState);
     window.checkWin = jest.fn(() => ({}));
     window.resetGame = jest.fn();
+    window.EventSource = jest.fn().mockImplementation(() => ({}));
     document.dispatchEvent = jest.fn();
     document.addEventListener = jest.fn();
 
@@ -135,6 +136,7 @@ describe('game', () => {
     window.onNewStateSelectColumnFactory = jest.fn(() => ({}));
     window.onGameOverShowWinnerFactory = jest.fn(() => ({}));
     window.onGameErrorShowNotification = jest.fn(() => ({}));
+    window.EventSource = jest.fn().mockImplementation(() => ({}));
     const errorDetails = {};
     window.getState = jest.fn().mockRejectedValue({
       detail: errorDetails,
@@ -207,6 +209,7 @@ describe('game', () => {
     window.getState = jest.fn(async () => initialState);
     window.checkWin = jest.fn(() => ({}));
     window.resetGame = jest.fn();
+    window.EventSource = jest.fn().mockImplementation(() => ({}));
     document.dispatchEvent = jest.fn();
     document.addEventListener = jest.fn();
 
@@ -277,6 +280,7 @@ describe('game', () => {
     window.ErrorSource = {
       RESET_GAME: Symbol('RESET_GAME'),
     };
+    window.EventSource = jest.fn().mockImplementation(() => ({}));
     document.dispatchEvent = jest.fn();
     document.addEventListener = jest.fn();
 
